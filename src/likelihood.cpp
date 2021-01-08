@@ -1,6 +1,9 @@
 #include "likelihood.h"
 
 double ODEModel::caluculateLikelihood(Eigen::Matrix<double, 1, Eigen::Dynamic>& solution) {
+  constexpr double true_omega = 0.871;
+  constexpr double true_a = 0.291;
+
   const size_t N = solution.cols();
 
   // sample true solution in the interval [0,1]
