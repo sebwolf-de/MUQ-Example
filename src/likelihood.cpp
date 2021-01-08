@@ -12,5 +12,5 @@ double ODEModel::caluculateLikelihood(Eigen::Matrix<double, 1, Eigen::Dynamic>& 
   const Eigen::Matrix<double, 1, Eigen::Dynamic> true_solution = true_a * omega_time.cos();
   const Eigen::Matrix<double, 1, Eigen::Dynamic> difference = true_solution - solution;
 
-  return -std::pow(difference.norm(), 2);
+  return -difference.lpNorm<1>();
 }
