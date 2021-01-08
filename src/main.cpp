@@ -15,16 +15,20 @@ int main(int argc, char** argv) {
   auto localFactory = std::make_shared<UQ::MyMIComponentFactory>();
 
   boost::property_tree::ptree pt;
-  pt.put("NumSamples", 1e3); // number of samples for single level
+  const size_t N = 1e4;
+  //pt.put("NumSamples", N); // number of samples for single level
   pt.put("verbosity", 1);    // show some output
   pt.put("BurnIn", 10);
+  pt.put("NumSamples_0", 1000);
+  pt.put("NumSamples_1", 100);
+  pt.put("NumSamples_2", 10);
 
-  muq::SamplingAlgorithms::SLMCMC slmcmc(pt, localFactory);
-  std::shared_ptr<muq::SamplingAlgorithms::SampleCollection> samples = slmcmc.Run();
+  muq::SamplingAlgorithms::MIMCMC mimcmc(pt, localFactory);
+  std::shared_ptr<muq::SamplingAlgorithms::SampleCollection> samples = mimcmc.Run();
 
-  std::cout << "SL mean Param: " << slmcmc.MeanParameter().transpose() << std::endl;
-  std::cout << "SL mean QOI: " << slmcmc.MeanQOI().transpose() << std::endl;
-  samples->WriteToFile("test.hdf5");
+  std::cout << "ML mean Param: " << mimcmc.MeanParam().transpose() << std::endl;
+  std::cout << "ML mean QOI: " << mimcmc.MeanQOI().transpose() << std::endl;
+  mimcmc.WriteToFile("test.hdf5");
 
   return 0;
 }

@@ -22,7 +22,7 @@ std::shared_ptr<UQ::MCMCProposal> UQ::MyMIComponentFactory::Proposal(
 
 std::shared_ptr<UQ::MultiIndex> UQ::MyMIComponentFactory::FinestIndex() {
   auto index = std::make_shared<MultiIndex>(1);
-  index->SetValue(0, 1);
+  index->SetValue(0, 2);
   return index;
 }
 

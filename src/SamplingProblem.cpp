@@ -4,6 +4,7 @@ UQ::MySamplingProblem::MySamplingProblem(std::shared_ptr<MultiIndex> index)
     : AbstractSamplingProblem(Eigen::VectorXi::Constant(1, NUM_PARAM),
                               Eigen::VectorXi::Constant(1, NUM_PARAM)) {
   this->index = index;
+  std::cout << "Run Sampling Problem with index" << index->GetValue(0) << std::endl;
 }
 
 double UQ::MySamplingProblem::LogDensity(std::shared_ptr<SamplingState> const& state) {
@@ -14,7 +15,8 @@ double UQ::MySamplingProblem::LogDensity(std::shared_ptr<SamplingState> const& s
       state->state[0][1] < 0.0)
     return -24;
 
-  auto piece = std::make_shared<ODEModel::MyODEPiece>();
+  const size_t N = std::pow(35, (index->GetValue(0)+1)) + 1;
+  auto piece = std::make_shared<ODEModel::MyODEPiece>(N);
   std::vector<Eigen::VectorXd> inputs(1);
   inputs.at(0) = state->state[0];
   std::vector<Eigen::VectorXd> outputs = piece->Evaluate(inputs);
@@ -22,7 +24,7 @@ double UQ::MySamplingProblem::LogDensity(std::shared_ptr<SamplingState> const& s
   const auto likelihood = ODEModel::caluculateLikelihood(solution);
 
   // Create some debug output
-  std::cout << "parameter:" << state->state[0].transpose() << ", likelihood: " << likelihood
+  std::cout << "DOFs: " << N << ", parameter:" << state->state[0].transpose() << ", likelihood: " << likelihood
             << std::endl;
   return likelihood;
 }
