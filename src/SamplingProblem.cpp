@@ -21,12 +21,12 @@ double UQ::MySamplingProblem::LogDensity(std::shared_ptr<SamplingState> const& s
   inputs.at(0) = state->state[0];
   std::vector<Eigen::VectorXd> outputs = piece->Evaluate(inputs);
   Eigen::Matrix<double, 1, Eigen::Dynamic> solution = outputs.at(0);
-  const auto likelihood = ODEModel::caluculateLikelihood(solution);
+  const auto logLikelihood = ODEModel::caluculateLogLikelihood(solution);
 
   // Create some debug output
-  std::cout << "DOFs: " << N << ", parameter:" << state->state[0].transpose() << ", likelihood: " << likelihood
+  std::cout << "DOFs: " << N << ", parameter:" << state->state[0].transpose() << ", likelihood: " << logLikelihood
             << std::endl;
-  return likelihood;
+  return logLikelihood;
 }
 
 std::shared_ptr<UQ::SamplingState> UQ::MySamplingProblem::QOI() {
