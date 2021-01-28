@@ -1,8 +1,10 @@
 #include "SamplingProblem.h"
+#include "likelihood.h"
 
-UQ::MySamplingProblem::MySamplingProblem(std::shared_ptr<MultiIndex> index)
+UQ::MySamplingProblem::MySamplingProblem(std::shared_ptr<MultiIndex> index, const ODEModel::LikelihoodEstimator& estimator)
     : AbstractSamplingProblem(Eigen::VectorXi::Constant(1, NUM_PARAM),
-                              Eigen::VectorXi::Constant(1, NUM_PARAM)) {
+                              Eigen::VectorXi::Constant(1, NUM_PARAM)),
+      estimator(estimator) {
   this->index = index;
   std::cout << "Run Sampling Problem with index" << index->GetValue(0) << std::endl;
 }
@@ -21,7 +23,7 @@ double UQ::MySamplingProblem::LogDensity(std::shared_ptr<SamplingState> const& s
   inputs.at(0) = state->state[0];
   std::vector<Eigen::VectorXd> outputs = piece->Evaluate(inputs);
   Eigen::Matrix<double, 1, Eigen::Dynamic> solution = outputs.at(0);
-  const auto logLikelihood = ODEModel::caluculateLogLikelihood(solution);
+  const auto logLikelihood = estimator.caluculateLogLikelihood(solution);
 
   // Create some debug output
   std::cout << "DOFs: " << N << ", parameter:" << state->state[0].transpose() << ", likelihood: " << logLikelihood

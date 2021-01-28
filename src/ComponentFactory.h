@@ -9,6 +9,7 @@
 #include "MUQ/SamplingAlgorithms/SamplingProblem.h"
 #include "MUQ/SamplingAlgorithms/SubsamplingMIProposal.h"
 #include "MUQ/Utilities/MultiIndices/MultiIndex.h"
+#include "likelihood.h"
 
 namespace UQ {
 
@@ -31,5 +32,10 @@ class MyMIComponentFactory : public MIComponentFactory {
   virtual std::shared_ptr<MIInterpolation>
   Interpolation(std::shared_ptr<MultiIndex> const& index) override;
   virtual Eigen::VectorXd StartingPoint(std::shared_ptr<MultiIndex> const& index) override;
+
+  MyMIComponentFactory(std::string filename);
+
+  private:
+    const ODEModel::LikelihoodEstimator estimator;
 };
 } // namespace UQ

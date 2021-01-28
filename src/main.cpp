@@ -12,7 +12,7 @@
 
 int main(int argc, char** argv) {
 
-  auto localFactory = std::make_shared<UQ::MyMIComponentFactory>();
+  auto localFactory = std::make_shared<UQ::MyMIComponentFactory>("true_solution.dat");
 
   boost::property_tree::ptree pt;
   const size_t N = 1e4;

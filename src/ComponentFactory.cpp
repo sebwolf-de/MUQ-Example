@@ -39,7 +39,7 @@ std::shared_ptr<UQ::MCMCProposal> UQ::MyMIComponentFactory::CoarseProposal(
 
 std::shared_ptr<UQ::AbstractSamplingProblem>
 UQ::MyMIComponentFactory::SamplingProblem(std::shared_ptr<MultiIndex> const& index) {
-  return std::make_shared<MySamplingProblem>(index);
+  return std::make_shared<MySamplingProblem>(index, estimator);
 }
 
 std::shared_ptr<UQ::MIInterpolation>
@@ -53,3 +53,6 @@ Eigen::VectorXd UQ::MyMIComponentFactory::StartingPoint(std::shared_ptr<MultiInd
   start(1) = .5;
   return start;
 }
+
+UQ::MyMIComponentFactory::MyMIComponentFactory(std::string filename) :
+  estimator(ODEModel::LikelihoodEstimator(filename)) { }

@@ -5,18 +5,20 @@
 #include <iostream>
 #include <fstream>
 
-double ODEModel::caluculateLogLikelihood(Eigen::Matrix<double, 1, Eigen::Dynamic>& solution) {
+ODEModel::LikelihoodEstimator::LikelihoodEstimator(const std::string& name) :
+  reference_from_file(readFromFile(name)) { }
+
+double ODEModel::LikelihoodEstimator::caluculateLogLikelihood(const Eigen::Matrix<double, 1, Eigen::Dynamic>& solution) const {
   const size_t N = solution.cols();
   const Eigen::VectorXd solution_time = Eigen::ArrayXd::LinSpaced(N, 0, 1);
 
-  const auto reference = readFromFile(std::string("true_solution.dat"));
-  const Eigen::MatrixXd reference_interpolated = interpolate(reference, solution_time);
+  const Eigen::MatrixXd reference_interpolated = interpolate(reference_from_file, solution_time);
   const Eigen::MatrixXd difference = reference_interpolated.transpose() - solution;
 
   return -difference.lpNorm<1>();
 }
 
-ODEModel::function ODEModel::readFromFile(std::string file) {
+ODEModel::LikelihoodEstimator::function ODEModel::LikelihoodEstimator::readFromFile(const std::string& file) const {
     std::ifstream in(file);
     std::string line;
 
@@ -41,7 +43,7 @@ ODEModel::function ODEModel::readFromFile(std::string file) {
     return {time, x};
 }
 
-Eigen::VectorXd ODEModel::interpolate(const function& f, const Eigen::VectorXd& other_time) {
+Eigen::VectorXd ODEModel::LikelihoodEstimator::interpolate(const function& f, const Eigen::VectorXd& other_time) const {
   //consistency check:
   //othertime is a subset of f.time
   assert(other_time(0) >= f.time(0));
@@ -65,8 +67,3 @@ Eigen::VectorXd ODEModel::interpolate(const function& f, const Eigen::VectorXd& 
   }
   return other_x;
 }
-
-
-
-
-
