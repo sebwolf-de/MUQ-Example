@@ -36,6 +36,6 @@ class MyMIComponentFactory : public MIComponentFactory {
   MyMIComponentFactory(std::string filename);
 
   private:
-    const ODEModel::LikelihoodEstimator estimator;
+  const ODEModel::LikelihoodEstimator estimator;
 };
 } // namespace UQ

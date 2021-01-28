@@ -16,8 +16,8 @@ int main(int argc, char** argv) {
 
   boost::property_tree::ptree pt;
   const size_t N = 1e4;
-  //pt.put("NumSamples", N); // number of samples for single level
-  pt.put("verbosity", 1);    // show some output
+  // pt.put("NumSamples", N); // number of samples for single level
+  pt.put("verbosity", 1); // show some output
   pt.put("BurnIn", 10);
   pt.put("NumSamples_0", 1000);
   pt.put("NumSamples_1", 100);

@@ -1,7 +1,8 @@
 #include "SamplingProblem.h"
 #include "likelihood.h"
 
-UQ::MySamplingProblem::MySamplingProblem(std::shared_ptr<MultiIndex> index, const ODEModel::LikelihoodEstimator& estimator)
+UQ::MySamplingProblem::MySamplingProblem(std::shared_ptr<MultiIndex> index,
+                                         const ODEModel::LikelihoodEstimator& estimator)
     : AbstractSamplingProblem(Eigen::VectorXi::Constant(1, NUM_PARAM),
                               Eigen::VectorXi::Constant(1, NUM_PARAM)),
       estimator(estimator) {
@@ -17,7 +18,7 @@ double UQ::MySamplingProblem::LogDensity(std::shared_ptr<SamplingState> const& s
       state->state[0][1] < 0.0)
     return -24;
 
-  const size_t N = std::pow(35, (index->GetValue(0)+1)) + 1;
+  const size_t N = std::pow(35, (index->GetValue(0) + 1)) + 1;
   auto piece = std::make_shared<ODEModel::MyODEPiece>(N);
   std::vector<Eigen::VectorXd> inputs(1);
   inputs.at(0) = state->state[0];
@@ -26,8 +27,8 @@ double UQ::MySamplingProblem::LogDensity(std::shared_ptr<SamplingState> const& s
   const auto logLikelihood = estimator.caluculateLogLikelihood(solution);
 
   // Create some debug output
-  std::cout << "DOFs: " << N << ", parameter:" << state->state[0].transpose() << ", likelihood: " << logLikelihood
-            << std::endl;
+  std::cout << "DOFs: " << N << ", parameter:" << state->state[0].transpose()
+            << ", likelihood: " << logLikelihood << std::endl;
   return logLikelihood;
 }
 

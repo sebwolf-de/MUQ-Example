@@ -54,5 +54,5 @@ Eigen::VectorXd UQ::MyMIComponentFactory::StartingPoint(std::shared_ptr<MultiInd
   return start;
 }
 
-UQ::MyMIComponentFactory::MyMIComponentFactory(std::string filename) :
-  estimator(ODEModel::LikelihoodEstimator(filename)) { }
+UQ::MyMIComponentFactory::MyMIComponentFactory(std::string filename)
+    : estimator(ODEModel::LikelihoodEstimator(filename)) {}

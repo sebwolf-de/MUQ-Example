@@ -9,9 +9,10 @@ namespace ODEModel {
 class MyODEPiece : public muq::Modeling::ModPiece {
   public:
   MyODEPiece(size_t N)
-      : muq::Modeling::ModPiece(2 * Eigen::VectorXi::Ones(1),    // inputSizes = [2]
-                                N * Eigen::VectorXi::Ones(1)),   // outputSizes = [N]
-        N(N), dt(1/double(N-1)) {};
+      : muq::Modeling::ModPiece(2 * Eigen::VectorXi::Ones(1),  // inputSizes = [2]
+                                N * Eigen::VectorXi::Ones(1)), // outputSizes = [N]
+        N(N), dt(1 / double(N - 1)){};
+
   protected:
   // sample 1 second
   const size_t N;

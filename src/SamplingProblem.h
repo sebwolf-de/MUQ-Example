@@ -23,7 +23,8 @@ using namespace muq::Utilities;
 
 class MySamplingProblem : public AbstractSamplingProblem {
   public:
-  MySamplingProblem(std::shared_ptr<MultiIndex> index, const ODEModel::LikelihoodEstimator& likelihoodEstimator);
+  MySamplingProblem(std::shared_ptr<MultiIndex> index,
+                    const ODEModel::LikelihoodEstimator& likelihoodEstimator);
 
   virtual ~MySamplingProblem(){};
 
