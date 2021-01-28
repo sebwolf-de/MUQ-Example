@@ -1,5 +1,6 @@
-#include "SamplingProblem.h"
-#include "likelihood.h"
+#include "UQ/SamplingProblem.h"
+
+#include "ODEModel/LikelihoodEstimator.h"
 
 UQ::MySamplingProblem::MySamplingProblem(std::shared_ptr<MultiIndex> index,
                                          const ODEModel::LikelihoodEstimator& estimator)

@@ -10,8 +10,8 @@
 #include "MUQ/SamplingAlgorithms/SubsamplingMIProposal.h"
 #include "MUQ/Utilities/MultiIndices/MultiIndex.h"
 
-#include "ODEModel.h"
-#include "likelihood.h"
+#include "ODEModel/LikelihoodEstimator.h"
+#include "ODEModel/ODEPiece.h"
 
 static constexpr int NUM_PARAM = 2;
 

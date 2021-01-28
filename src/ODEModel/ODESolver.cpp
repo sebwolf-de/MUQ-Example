@@ -1,4 +1,4 @@
-#include "ODESolver.h"
+#include "ODEModel/ODESolver.h"
 
 #include "Eigen/src/Core/Matrix.h"
 #include "Eigen/src/QR/ColPivHouseholderQR.h"

@@ -1,9 +1,9 @@
-#include "ComponentFactory.h"
+#include "UQ/MIComponentFactory.h"
 
 #include "MUQ/SamplingAlgorithms/MIComponentFactory.h"
 
-#include "Interpolation.h"
-#include "SamplingProblem.h"
+#include "UQ/MIInterpolation.h"
+#include "UQ/SamplingProblem.h"
 
 std::shared_ptr<UQ::MCMCProposal> UQ::MyMIComponentFactory::Proposal(
     std::shared_ptr<MultiIndex> const& index,

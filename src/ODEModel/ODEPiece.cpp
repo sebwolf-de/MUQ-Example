@@ -1,4 +1,4 @@
-#include "ODEModel.h"
+#include "ODEModel/ODEPiece.h"
 #include "Eigen/src/Core/util/Constants.h"
 
 void ODEModel::MyODEPiece::EvaluateImpl(muq::Modeling::ref_vector<Eigen::VectorXd> const& inputs) {

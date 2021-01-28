@@ -2,7 +2,7 @@
 
 #include <MUQ/Modeling/ModPiece.h>
 
-#include "ODESolver.h"
+#include "ODEModel/ODESolver.h"
 
 namespace ODEModel {
 

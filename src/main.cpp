@@ -6,9 +6,9 @@
 #include "MUQ/SamplingAlgorithms/SLMCMC.h"
 #include <boost/property_tree/ptree.hpp>
 
-#include "ComponentFactory.h"
-#include "Interpolation.h"
-#include "SamplingProblem.h"
+#include "UQ/MIComponentFactory.h"
+#include "UQ/MIInterpolation.h"
+#include "UQ/SamplingProblem.h"
 
 int main(int argc, char** argv) {
 

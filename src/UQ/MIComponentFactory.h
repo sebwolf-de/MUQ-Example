@@ -9,7 +9,8 @@
 #include "MUQ/SamplingAlgorithms/SamplingProblem.h"
 #include "MUQ/SamplingAlgorithms/SubsamplingMIProposal.h"
 #include "MUQ/Utilities/MultiIndices/MultiIndex.h"
-#include "likelihood.h"
+
+#include "ODEModel/LikelihoodEstimator.h"
 
 namespace UQ {
 
