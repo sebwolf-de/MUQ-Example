@@ -5,6 +5,9 @@
 #include <fstream>
 #include <iostream>
 
+ODEModel::LikelihoodEstimator::LikelihoodEstimator(function f)
+    : reference_from_file(f) {}
+
 ODEModel::LikelihoodEstimator::LikelihoodEstimator(const std::string& name)
     : reference_from_file(readFromFile(name)) {}
 
@@ -19,8 +22,8 @@ double ODEModel::LikelihoodEstimator::caluculateLogLikelihood(
   return -difference.lpNorm<1>();
 }
 
-ODEModel::LikelihoodEstimator::function
-ODEModel::LikelihoodEstimator::readFromFile(const std::string& file) const {
+ODEModel::function
+ODEModel::readFromFile(const std::string& file) {
   std::ifstream in(file);
   std::string line;
 
@@ -47,8 +50,8 @@ ODEModel::LikelihoodEstimator::readFromFile(const std::string& file) const {
 }
 
 Eigen::VectorXd
-ODEModel::LikelihoodEstimator::interpolate(const function& f,
-                                           const Eigen::VectorXd& other_time) const {
+ODEModel::interpolate(const function& f,
+                                           const Eigen::VectorXd& other_time) {
   // consistency check:
   // othertime is a subset of f.time
   assert(other_time(0) >= f.time(0));
@@ -60,7 +63,10 @@ ODEModel::LikelihoodEstimator::interpolate(const function& f,
     const double tau = other_time(i);
     // find first time, that is bigger than tau
     for (size_t j = last_index; j < f.time.size(); j++) {
-      if (f.time(j) > tau) {
+      if (f.time(j) == tau) {
+        other_x(i) = f.x(j);
+        break; 
+      } else if (f.time(j) > tau) {
         const double alpha = (tau - f.time(j - 1)) / (f.time(j) - f.time(j - 1));
         const double beta = (f.time(j) - tau) / (f.time(j) - f.time(j - 1));
         const double xi = beta * f.x(j - 1) + alpha * f.x(j);
