@@ -9,6 +9,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 add_library(uq 
   src/UQ/SamplingProblem.cpp
+  src/UQ/StaticLoadBalancer.cpp
   src/UQ/MIInterpolation.cpp
   src/UQ/MIComponentFactory.cpp)
 add_library(ode 
@@ -32,3 +33,7 @@ find_package(Eigen3 REQUIRED)
 find_package(MUQ REQUIRED)
 target_link_libraries(main ${MUQ_LIBRARIES} ${MUQ_LINK_LIBRARIES})
 include_directories(${MUQ_INCLUDE_DIRS})
+
+find_package(MPI REQUIRED)
+include_directories(${MPI_CXX_INCLUDE_PATH})
+target_link_libraries(main MPI::MPI_CXX)

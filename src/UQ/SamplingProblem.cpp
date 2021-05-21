@@ -1,14 +1,17 @@
 #include "UQ/SamplingProblem.h"
+#include "spdlog/spdlog.h"
 
 #include "ODEModel/LikelihoodEstimator.h"
 
-UQ::MySamplingProblem::MySamplingProblem(std::shared_ptr<MultiIndex> index,
+UQ::MySamplingProblem::MySamplingProblem(std::shared_ptr<parcer::Communicator> comm,
+                                         std::shared_ptr<parcer::Communicator> globalComm,
+                                         std::shared_ptr<MultiIndex> index,
                                          const ODEModel::LikelihoodEstimator& estimator)
     : AbstractSamplingProblem(Eigen::VectorXi::Constant(1, NUM_PARAM),
                               Eigen::VectorXi::Constant(1, NUM_PARAM)),
-      estimator(estimator) {
-  this->index = index;
-  std::cout << "Run Sampling Problem with index" << index->GetValue(0) << std::endl;
+      estimator(estimator), comm(comm), globalComm(globalComm), index(index) {
+  spdlog::info("Run Sampling Problem with index {} on Rank {}.", index->GetValue(0),
+               comm->GetRank());
 }
 
 double UQ::MySamplingProblem::LogDensity(std::shared_ptr<SamplingState> const& state) {
@@ -28,8 +31,8 @@ double UQ::MySamplingProblem::LogDensity(std::shared_ptr<SamplingState> const& s
   const auto logLikelihood = estimator.caluculateLogLikelihood(solution);
 
   // Create some debug output
-  std::cout << "DOFs: " << N << ", parameter:" << state->state[0].transpose()
-            << ", likelihood: " << logLikelihood << std::endl;
+  spdlog::debug("Rank {}, run model for parameter: ({}, {}) with {} DOFs, likelihood: {}",
+                comm->GetRank(), state->state[0][0], state->state[0][1], N, logLikelihood);
   return logLikelihood;
 }
 

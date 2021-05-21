@@ -23,7 +23,9 @@ using namespace muq::Utilities;
 
 class MySamplingProblem : public AbstractSamplingProblem {
   public:
-  MySamplingProblem(std::shared_ptr<MultiIndex> index,
+  MySamplingProblem(std::shared_ptr<parcer::Communicator> comm,
+                    std::shared_ptr<parcer::Communicator> globalComm,
+                    std::shared_ptr<MultiIndex> index,
                     const ODEModel::LikelihoodEstimator& likelihoodEstimator);
 
   virtual ~MySamplingProblem(){};
@@ -33,8 +35,10 @@ class MySamplingProblem : public AbstractSamplingProblem {
 
   private:
   const ODEModel::LikelihoodEstimator& estimator;
-  std::shared_ptr<SamplingState> lastState = nullptr;
+  std::shared_ptr<parcer::Communicator> comm;
+  std::shared_ptr<parcer::Communicator> globalComm;
   std::shared_ptr<MultiIndex> index;
+  std::shared_ptr<SamplingState> lastState = nullptr;
 };
 
 } // namespace UQ

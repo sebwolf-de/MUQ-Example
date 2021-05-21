@@ -22,7 +22,7 @@ std::shared_ptr<UQ::MCMCProposal> UQ::MyMIComponentFactory::Proposal(
 
 std::shared_ptr<UQ::MultiIndex> UQ::MyMIComponentFactory::FinestIndex() {
   auto index = std::make_shared<MultiIndex>(1);
-  index->SetValue(0, 2);
+  index->SetValue(0, 0);
   return index;
 }
 
@@ -39,7 +39,7 @@ std::shared_ptr<UQ::MCMCProposal> UQ::MyMIComponentFactory::CoarseProposal(
 
 std::shared_ptr<UQ::AbstractSamplingProblem>
 UQ::MyMIComponentFactory::SamplingProblem(std::shared_ptr<MultiIndex> const& index) {
-  return std::make_shared<MySamplingProblem>(index, estimator);
+  return std::make_shared<MySamplingProblem>(communicator, globalCommunicator, index, estimator);
 }
 
 std::shared_ptr<UQ::MIInterpolation>
@@ -54,5 +54,10 @@ Eigen::VectorXd UQ::MyMIComponentFactory::StartingPoint(std::shared_ptr<MultiInd
   return start;
 }
 
-UQ::MyMIComponentFactory::MyMIComponentFactory(std::string filename)
-    : estimator(ODEModel::LikelihoodEstimator(filename)) {}
+UQ::MyMIComponentFactory::MyMIComponentFactory(
+    std::string filename, std::shared_ptr<parcer::Communicator> globalCommunicator)
+    : estimator(ODEModel::LikelihoodEstimator(filename)), globalCommunicator(globalCommunicator) {}
+
+void UQ::MyMIComponentFactory::SetComm(std::shared_ptr<parcer::Communicator> const& comm) {
+  communicator = comm;
+}

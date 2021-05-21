@@ -1,29 +1,56 @@
-#include "MUQ/SamplingAlgorithms/MIMCMC.h"
 #include <boost/property_tree/ptree.hpp>
+#include <mpi.h>
+
+#include "MUQ/SamplingAlgorithms/GreedyMLMCMC.h"
+#include "MUQ/SamplingAlgorithms/MIMCMC.h"
+#include "MUQ/SamplingAlgorithms/SLMCMC.h"
+
+#include "MUQ/Modeling/Distributions/Density.h"
+#include "MUQ/Modeling/Distributions/Gaussian.h"
+
+#include "MUQ/SamplingAlgorithms/CrankNicolsonProposal.h"
+#include "MUQ/SamplingAlgorithms/DummyKernel.h"
+#include "MUQ/SamplingAlgorithms/MHKernel.h"
+#include "MUQ/SamplingAlgorithms/MHProposal.h"
+#include "MUQ/SamplingAlgorithms/ParallelFixedSamplesMIMCMC.h"
+#include "MUQ/SamplingAlgorithms/SamplingProblem.h"
+#include "MUQ/SamplingAlgorithms/SubsamplingMIProposal.h"
 
 #include "UQ/MIComponentFactory.h"
 #include "UQ/MIInterpolation.h"
 #include "UQ/SamplingProblem.h"
+#include "UQ/StaticLoadBalancer.h"
+#include "spdlog/common.h"
 
 int main(int argc, char** argv) {
-
-  auto localFactory = std::make_shared<UQ::MyMIComponentFactory>("true_solution.dat");
+  MPI_Init(&argc, &argv);
+  spdlog::set_level(spdlog::level::info);
 
   boost::property_tree::ptree pt;
   const size_t N = 1e4;
   pt.put("verbosity", 1); // show some output
-  pt.put("BurnIn", 100);
-  pt.put("NumSamples_0", 10000);
-  pt.put("NumSamples_1", 1000);
-  pt.put("NumSamples_2", 100);
+  pt.put("MCMC.BurnIn", 1);
+  pt.put("NumSamples_0", 1000000);
+  pt.put("NumSamples_1", 10000);
+  pt.put("MLMCMC.Scheduling", true);
+  pt.put("MLMCMC.Subsampling", 0);
+  pt.put("MLMCMC.Subsampling_0", 0);
+  pt.put("MLMCMC.Subsampling_1", 0);
 
-  muq::SamplingAlgorithms::MIMCMC mimcmc(pt, localFactory);
-  std::shared_ptr<muq::SamplingAlgorithms::SampleCollection> samples = mimcmc.Run();
+  auto comm = std::make_shared<parcer::Communicator>(MPI_COMM_WORLD);
+  auto localFactory = std::make_shared<UQ::MyMIComponentFactory>("true_solution.dat", comm);
+  muq::SamplingAlgorithms::StaticLoadBalancingMIMCMC mimcmc(
+      pt, localFactory, std::make_shared<UQ::MyStaticLoadBalancer>(), comm);
 
-  std::cout << "ML mean Param: " << mimcmc.MeanParam().transpose() << std::endl;
-  std::cout << "ML mean QOI: " << mimcmc.MeanQOI().transpose() << std::endl;
-  
-  mimcmc.WriteToFile("test.hdf5");
+  if (comm->GetRank() == 0) {
+    mimcmc.Run();
+    Eigen::VectorXd meanQOI = mimcmc.MeanQOI();
+    spdlog::info("mean QOI: ({}, {})", meanQOI(0), meanQOI(1));
+    mimcmc.WriteToFile("samples.h5");
+  }
+
+  mimcmc.Finalize();
+  MPI_Finalize();
 
   return 0;
 }
