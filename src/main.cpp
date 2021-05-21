@@ -1,9 +1,4 @@
-#include "MUQ/SamplingAlgorithms/DummyKernel.h"
-#include "MUQ/SamplingAlgorithms/GreedyMLMCMC.h"
 #include "MUQ/SamplingAlgorithms/MIMCMC.h"
-#include "MUQ/SamplingAlgorithms/ParallelFixedSamplesMIMCMC.h"
-#include "MUQ/SamplingAlgorithms/ParallelMIComponentFactory.h"
-#include "MUQ/SamplingAlgorithms/SLMCMC.h"
 #include <boost/property_tree/ptree.hpp>
 
 #include "UQ/MIComponentFactory.h"
@@ -16,18 +11,18 @@ int main(int argc, char** argv) {
 
   boost::property_tree::ptree pt;
   const size_t N = 1e4;
-  // pt.put("NumSamples", N); // number of samples for single level
   pt.put("verbosity", 1); // show some output
-  pt.put("BurnIn", 10);
-  pt.put("NumSamples_0", 1000);
-  pt.put("NumSamples_1", 100);
-  pt.put("NumSamples_2", 10);
+  pt.put("BurnIn", 100);
+  pt.put("NumSamples_0", 10000);
+  pt.put("NumSamples_1", 1000);
+  pt.put("NumSamples_2", 100);
 
   muq::SamplingAlgorithms::MIMCMC mimcmc(pt, localFactory);
   std::shared_ptr<muq::SamplingAlgorithms::SampleCollection> samples = mimcmc.Run();
 
   std::cout << "ML mean Param: " << mimcmc.MeanParam().transpose() << std::endl;
   std::cout << "ML mean QOI: " << mimcmc.MeanQOI().transpose() << std::endl;
+  
   mimcmc.WriteToFile("test.hdf5");
 
   return 0;

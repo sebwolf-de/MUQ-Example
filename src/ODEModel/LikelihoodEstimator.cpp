@@ -19,7 +19,7 @@ double ODEModel::LikelihoodEstimator::caluculateLogLikelihood(
   const Eigen::MatrixXd reference_interpolated = interpolate(reference_from_file, solution_time);
   const Eigen::MatrixXd difference = reference_interpolated.transpose() - solution;
 
-  return -difference.lpNorm<1>();
+  return -std::pow(difference.lpNorm<1>(),2);
 }
 
 ODEModel::function
