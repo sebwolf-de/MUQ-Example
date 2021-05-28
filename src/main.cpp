@@ -24,14 +24,14 @@
 
 int main(int argc, char** argv) {
   MPI_Init(&argc, &argv);
-  spdlog::set_level(spdlog::level::info);
+  spdlog::set_level(spdlog::level::debug);
 
   boost::property_tree::ptree pt;
-  const size_t N = 1e4;
+  const size_t N = 1e2;
   pt.put("verbosity", 1); // show some output
   pt.put("MCMC.BurnIn", 1);
-  pt.put("NumSamples_0", 1000000);
-  pt.put("NumSamples_1", 10000);
+  pt.put("NumSamples_0", 100 * N);
+  pt.put("NumSamples_1", N);
   pt.put("MLMCMC.Scheduling", true);
   pt.put("MLMCMC.Subsampling", 0);
   pt.put("MLMCMC.Subsampling_0", 0);

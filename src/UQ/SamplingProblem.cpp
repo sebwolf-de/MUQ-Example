@@ -3,13 +3,12 @@
 
 #include "ODEModel/LikelihoodEstimator.h"
 
-UQ::MySamplingProblem::MySamplingProblem(std::shared_ptr<parcer::Communicator> comm,
-                                         std::shared_ptr<parcer::Communicator> globalComm,
-                                         std::shared_ptr<MultiIndex> index,
+UQ::MySamplingProblem::MySamplingProblem(const std::shared_ptr<parcer::Communicator>& comm,
+                                         const std::shared_ptr<MultiIndex>& index,
                                          const ODEModel::LikelihoodEstimator& estimator)
     : AbstractSamplingProblem(Eigen::VectorXi::Constant(1, NUM_PARAM),
                               Eigen::VectorXi::Constant(1, NUM_PARAM)),
-      estimator(estimator), comm(comm), globalComm(globalComm), index(index) {
+      estimator(estimator), comm(comm), index(index) {
   spdlog::info("Run Sampling Problem with index {} on Rank {}.", index->GetValue(0),
                comm->GetRank());
 }
@@ -17,10 +16,12 @@ UQ::MySamplingProblem::MySamplingProblem(std::shared_ptr<parcer::Communicator> c
 double UQ::MySamplingProblem::LogDensity(std::shared_ptr<SamplingState> const& state) {
   lastState = state;
 
+  const double badLikelihood = -24;
   // Discard stupid parameters
   if (state->state[0][0] > 1.0 || state->state[0][0] < 0.0 || state->state[0][1] > 1.0 ||
-      state->state[0][1] < 0.0)
-    return -24;
+      state->state[0][1] < 0.0) {
+    return badLikelihood;
+  }
 
   const size_t N = std::pow(35, (index->GetValue(0) + 1)) + 1;
   auto piece = std::make_shared<ODEModel::MyODEPiece>(N);

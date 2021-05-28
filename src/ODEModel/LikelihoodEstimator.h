@@ -8,7 +8,7 @@ struct function {
   Eigen::VectorXd time;
   Eigen::VectorXd x;
 };
-function readFromFile(const std::string& file);
+function readFromFile(const std::string& filename);
 Eigen::VectorXd interpolate(const function& f, const Eigen::VectorXd& other_time);
 
 class LikelihoodEstimator {

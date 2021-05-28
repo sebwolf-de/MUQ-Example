@@ -4,16 +4,20 @@
 
 #include "UQ/MIInterpolation.h"
 #include "UQ/SamplingProblem.h"
+#include <memory>
+#include <utility>
 
 std::shared_ptr<UQ::MCMCProposal> UQ::MyMIComponentFactory::Proposal(
-    std::shared_ptr<MultiIndex> const& index,
-    std::shared_ptr<AbstractSamplingProblem> const& samplingProblem) {
+    [[maybe_unused]] const std::shared_ptr<MultiIndex>& index,
+    const std::shared_ptr<AbstractSamplingProblem>& samplingProblem) {
   pt::ptree pt;
   pt.put("BlockIndex", 0);
 
   auto mu = Eigen::VectorXd::Zero(NUM_PARAM);
   Eigen::MatrixXd cov = Eigen::MatrixXd::Identity(NUM_PARAM, NUM_PARAM);
-  cov *= 0.005;
+  // covariance is due to some hyperparameter tuning
+  constexpr double covariance = 0.005;
+  cov *= covariance;
 
   auto prior = std::make_shared<Gaussian>(mu, cov);
 
@@ -27,37 +31,41 @@ std::shared_ptr<UQ::MultiIndex> UQ::MyMIComponentFactory::FinestIndex() {
 }
 
 std::shared_ptr<UQ::MCMCProposal> UQ::MyMIComponentFactory::CoarseProposal(
-    std::shared_ptr<MultiIndex> const& index,
+    [[maybe_unused]] std::shared_ptr<MultiIndex> const& index,
     std::shared_ptr<AbstractSamplingProblem> const& coarseProblem,
     std::shared_ptr<SingleChainMCMC> const& coarseChain) {
   pt::ptree ptProposal;
   ptProposal.put("BlockIndex", 0);
-  int subsampling = 5;
+  // subsampling is due to hyperparameter tuning
+  const int subsampling = 5;
   ptProposal.put("Subsampling", subsampling);
   return std::make_shared<SubsamplingMIProposal>(ptProposal, coarseProblem, coarseChain);
 }
 
 std::shared_ptr<UQ::AbstractSamplingProblem>
 UQ::MyMIComponentFactory::SamplingProblem(std::shared_ptr<MultiIndex> const& index) {
-  return std::make_shared<MySamplingProblem>(communicator, globalCommunicator, index, estimator);
+  return std::make_shared<MySamplingProblem>(communicator, index, estimator);
 }
 
-std::shared_ptr<UQ::MIInterpolation>
-UQ::MyMIComponentFactory::Interpolation(std::shared_ptr<MultiIndex> const& index) {
+std::shared_ptr<UQ::MIInterpolation> UQ::MyMIComponentFactory::Interpolation([
+    [maybe_unused]] std::shared_ptr<MultiIndex> const& index) {
   return std::make_shared<MyInterpolation>();
 }
 
-Eigen::VectorXd UQ::MyMIComponentFactory::StartingPoint(std::shared_ptr<MultiIndex> const& index) {
+Eigen::VectorXd UQ::MyMIComponentFactory::StartingPoint([
+    [maybe_unused]] std::shared_ptr<MultiIndex> const& index) {
   Eigen::VectorXd start = Eigen::VectorXd::Ones(NUM_PARAM);
-  start(0) = .5;
-  start(1) = .5;
+  // initial values
+  const double initial_value = 0.5;
+  start(0) = initial_value;
+  start(1) = initial_value;
   return start;
 }
 
-UQ::MyMIComponentFactory::MyMIComponentFactory(
-    std::string filename, std::shared_ptr<parcer::Communicator> globalCommunicator)
-    : estimator(ODEModel::LikelihoodEstimator(filename)), globalCommunicator(globalCommunicator) {}
+UQ::MyMIComponentFactory::MyMIComponentFactory(const std::string& filename,
+                                               std::shared_ptr<parcer::Communicator> communicator)
+    : estimator(ODEModel::LikelihoodEstimator(filename)), communicator(std::move(communicator)) {}
 
-void UQ::MyMIComponentFactory::SetComm(std::shared_ptr<parcer::Communicator> const& comm) {
+void UQ::MyMIComponentFactory::SetComm(const std::shared_ptr<parcer::Communicator>& comm) {
   communicator = comm;
 }

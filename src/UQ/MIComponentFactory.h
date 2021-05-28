@@ -27,27 +27,25 @@ using namespace muq::Utilities;
 
 class MyMIComponentFactory : public ParallelizableMIComponentFactory {
   public:
-  virtual std::shared_ptr<MCMCProposal>
+  std::shared_ptr<MCMCProposal>
   Proposal(std::shared_ptr<MultiIndex> const& index,
            std::shared_ptr<AbstractSamplingProblem> const& samplingProblem) override;
-  virtual std::shared_ptr<MultiIndex> FinestIndex() override;
-  virtual std::shared_ptr<MCMCProposal>
+  std::shared_ptr<MultiIndex> FinestIndex() override;
+  std::shared_ptr<MCMCProposal>
   CoarseProposal(std::shared_ptr<MultiIndex> const& index,
                  std::shared_ptr<AbstractSamplingProblem> const& coarseProblem,
                  std::shared_ptr<SingleChainMCMC> const& coarseChain) override;
-  virtual std::shared_ptr<AbstractSamplingProblem>
+  std::shared_ptr<AbstractSamplingProblem>
   SamplingProblem(std::shared_ptr<MultiIndex> const& index) override;
-  virtual std::shared_ptr<MIInterpolation>
-  Interpolation(std::shared_ptr<MultiIndex> const& index) override;
-  virtual Eigen::VectorXd StartingPoint(std::shared_ptr<MultiIndex> const& index) override;
+  std::shared_ptr<MIInterpolation> Interpolation(std::shared_ptr<MultiIndex> const& index) override;
+  Eigen::VectorXd StartingPoint(std::shared_ptr<MultiIndex> const& index) override;
   void SetComm(std::shared_ptr<parcer::Communicator> const& comm) override;
 
-  MyMIComponentFactory(std::string filename,
-                       std::shared_ptr<parcer::Communicator> globalCommunicator);
+  MyMIComponentFactory(const std::string& filename,
+                       std::shared_ptr<parcer::Communicator> communicator);
 
   private:
   const ODEModel::LikelihoodEstimator estimator;
   std::shared_ptr<parcer::Communicator> communicator;
-  std::shared_ptr<parcer::Communicator> globalCommunicator;
 };
 } // namespace UQ

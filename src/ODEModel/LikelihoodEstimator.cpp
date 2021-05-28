@@ -4,19 +4,21 @@
 #include "Eigen/src/Core/util/Constants.h"
 #include <fstream>
 #include <iostream>
+#include <utility>
 
-ODEModel::LikelihoodEstimator::LikelihoodEstimator(function f) : reference_from_file(f) {}
+ODEModel::LikelihoodEstimator::LikelihoodEstimator(function f)
+    : reference_from_file(std::move(f)) {}
 
-ODEModel::LikelihoodEstimator::LikelihoodEstimator(const std::string& name)
-    : reference_from_file(readFromFile(name)) {}
+ODEModel::LikelihoodEstimator::LikelihoodEstimator(const std::string& filename)
+    : reference_from_file(readFromFile(filename)) {}
 
 double ODEModel::LikelihoodEstimator::caluculateLogLikelihood(
     const Eigen::Matrix<double, 1, Eigen::Dynamic>& solution) const {
   const size_t N = solution.cols();
   const Eigen::VectorXd solution_time = Eigen::ArrayXd::LinSpaced(N, 0, 1);
 
-  const Eigen::MatrixXd reference_interpolated = interpolate(reference_from_file, solution_time);
-  const Eigen::MatrixXd difference = reference_interpolated.transpose() - solution;
+  Eigen::MatrixXd reference_interpolated = interpolate(reference_from_file, solution_time);
+  Eigen::MatrixXd difference = reference_interpolated.transpose() - solution;
 
   return -std::pow(difference.lpNorm<1>(), 2);
 }
@@ -32,7 +34,7 @@ ODEModel::function ODEModel::readFromFile(const std::string& file) {
   const std::string token2 =
       line.substr(line.find(delimiter) + delimiter.size(), line.size()); // should be N
   const double dt = std::stof(token1);
-  const size_t N = std::stoi(token2);
+  const auto N = std::stoi(token2);
 
   Eigen::VectorXd time = Eigen::ArrayXd::LinSpaced(N, 0, (N - 1) * dt);
   Eigen::VectorXd x = Eigen::VectorXd::Zero(N);
@@ -55,10 +57,10 @@ Eigen::VectorXd ODEModel::interpolate(const function& f, const Eigen::VectorXd& 
 
   Eigen::VectorXd other_x = Eigen::VectorXd::Zero(other_time.size());
   size_t last_index = 0;
-  for (size_t i = 0; i < other_time.size(); i++) {
+  for (size_t i = 0; i < static_cast<unsigned>(other_time.size()); i++) {
     const double tau = other_time(i);
     // find first time, that is bigger than tau
-    for (size_t j = last_index; j < f.time.size(); j++) {
+    for (size_t j = last_index; j < static_cast<unsigned>(f.time.size()); j++) {
       if (f.time(j) == tau) {
         other_x(i) = f.x(j);
         break;

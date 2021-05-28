@@ -23,21 +23,17 @@ using namespace muq::Utilities;
 
 class MySamplingProblem : public AbstractSamplingProblem {
   public:
-  MySamplingProblem(std::shared_ptr<parcer::Communicator> comm,
-                    std::shared_ptr<parcer::Communicator> globalComm,
-                    std::shared_ptr<MultiIndex> index,
+  MySamplingProblem(const std::shared_ptr<parcer::Communicator>& comm,
+                    const std::shared_ptr<MultiIndex>& index,
                     const ODEModel::LikelihoodEstimator& likelihoodEstimator);
 
-  virtual ~MySamplingProblem(){};
-
-  virtual double LogDensity(std::shared_ptr<SamplingState> const& state) override;
-  virtual std::shared_ptr<SamplingState> QOI() override;
+  double LogDensity(std::shared_ptr<SamplingState> const& state) override;
+  std::shared_ptr<SamplingState> QOI() override;
 
   private:
   const ODEModel::LikelihoodEstimator& estimator;
-  std::shared_ptr<parcer::Communicator> comm;
-  std::shared_ptr<parcer::Communicator> globalComm;
-  std::shared_ptr<MultiIndex> index;
+  const std::shared_ptr<parcer::Communicator>& comm;
+  const std::shared_ptr<MultiIndex>& index;
   std::shared_ptr<SamplingState> lastState = nullptr;
 };
 
