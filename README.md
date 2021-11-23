@@ -19,7 +19,8 @@ The goal is to invert for parameters $\alpha, \omega$.
 * `tests': Contains unit tests, probably not working
 
 ## How to run ##
-* `mkdir build && cd build``
+* `mkdir build && cd build`
+Note: I use muq2 with commit `96aa709a3`.
 * `cmake ..` 
 * `make -j 8`
 * `python ../src/generate_true_solution.py`
