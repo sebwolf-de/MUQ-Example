@@ -9,7 +9,7 @@ cmdLineParser.add_argument('filename')
 cmdLineArgs = cmdLineParser.parse_args()
 
 hf = h5py.File(cmdLineArgs.filename, 'r')
-n1 = hf.get('samples')
+n1 = hf.get('Collector_model0_subchain_0_samples_rank_0').get("samples")
 n2 = np.array(n1)
 
 x = n2[0,:]
