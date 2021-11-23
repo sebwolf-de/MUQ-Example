@@ -8,7 +8,10 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -pedantic")
 
-set(CMAKE_CXX_CLANG_TIDY "clang-tidy-9")
+option(USE_CLANG_TIDY "Use clang tidy during compilation" OFF)
+if(USE_CLANG_TIDY) 
+  set(CMAKE_CXX_CLANG_TIDY "clang-tidy-9")
+endif()
 
 add_library(uq 
   src/UQ/SamplingProblem.cpp
