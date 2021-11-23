@@ -27,15 +27,13 @@ int main(int argc, char** argv) {
   spdlog::set_level(spdlog::level::debug);
 
   boost::property_tree::ptree pt;
-  const size_t N = 1e2;
+  const size_t N = 10000;
   pt.put("verbosity", 1); // show some output
   pt.put("MCMC.BurnIn", 1);
-  pt.put("NumSamples_0", 100 * N);
-  pt.put("NumSamples_1", N);
+  pt.put("NumSamples_0", N);
   pt.put("MLMCMC.Scheduling", true);
-  pt.put("MLMCMC.Subsampling", 0);
-  pt.put("MLMCMC.Subsampling_0", 0);
-  pt.put("MLMCMC.Subsampling_1", 0);
+  pt.put("MLMCMC.Subsampling", 1);
+  pt.put("MLMCMC.Subsampling_0", 3);
 
   auto comm = std::make_shared<parcer::Communicator>(MPI_COMM_WORLD);
   auto localFactory = std::make_shared<UQ::MyMIComponentFactory>("true_solution.dat", comm);

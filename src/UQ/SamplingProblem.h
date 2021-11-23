@@ -35,6 +35,7 @@ class MySamplingProblem : public AbstractSamplingProblem {
   const std::shared_ptr<parcer::Communicator>& comm;
   const std::shared_ptr<MultiIndex>& index;
   std::shared_ptr<SamplingState> lastState = nullptr;
+  static size_t runCount;
 };
 
 } // namespace UQ

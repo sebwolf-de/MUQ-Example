@@ -19,10 +19,13 @@ add_library(ode
   src/ODEModel/ODESolver.cpp
   src/ODEModel/ODEPiece.cpp
   src/ODEModel/LikelihoodEstimator.cpp)
+add_library(mpi
+  src/MPI/MPIHelpers.cpp)
 
 add_executable(main src/main.cpp)
 target_link_libraries(main uq)
 target_link_libraries(main ode)
+target_link_libraries(main mpi)
 
 add_executable(tests tests/test_main.cpp)
 target_sources(tests PRIVATE tests/ODEModel/LikelihoodEstimator.cpp)

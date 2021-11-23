@@ -4,6 +4,7 @@
 
 #include "UQ/MIInterpolation.h"
 #include "UQ/SamplingProblem.h"
+
 #include <memory>
 #include <utility>
 
@@ -36,9 +37,6 @@ std::shared_ptr<UQ::MCMCProposal> UQ::MyMIComponentFactory::CoarseProposal(
     std::shared_ptr<SingleChainMCMC> const& coarseChain) {
   pt::ptree ptProposal;
   ptProposal.put("BlockIndex", 0);
-  // subsampling is due to hyperparameter tuning
-  const int subsampling = 5;
-  ptProposal.put("Subsampling", subsampling);
   return std::make_shared<SubsamplingMIProposal>(ptProposal, coarseProblem, coarseChain);
 }
 
