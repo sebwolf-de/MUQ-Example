@@ -31,7 +31,5 @@ UQ::MyStaticLoadBalancer::numWorkers(std::shared_ptr<MultiIndex> modelIndex) {
   models_remaining--;
   ranks_remaining -= assignment.numGroups * assignment.numWorkersPerGroup;
 
-  assert(ranks_remaining >= 0);
-
   return assignment;
 }

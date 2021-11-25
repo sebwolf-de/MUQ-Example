@@ -32,12 +32,16 @@ std::shared_ptr<UQ::MultiIndex> UQ::MyMIComponentFactory::FinestIndex() {
 }
 
 std::shared_ptr<UQ::MCMCProposal> UQ::MyMIComponentFactory::CoarseProposal(
-    [[maybe_unused]] std::shared_ptr<MultiIndex> const& index,
+    [[maybe_unused]] std::shared_ptr<MultiIndex> const& fineIndex,
+    std::shared_ptr<MultiIndex> const& coarseIndex,
     std::shared_ptr<AbstractSamplingProblem> const& coarseProblem,
     std::shared_ptr<SingleChainMCMC> const& coarseChain) {
   pt::ptree ptProposal;
   ptProposal.put("BlockIndex", 0);
-  return std::make_shared<SubsamplingMIProposal>(ptProposal, coarseProblem, coarseChain);
+  // subsampling is due to hyperparameter tuning
+  const int subsampling = 5;
+  ptProposal.put("Subsampling", subsampling);
+  return std::make_shared<SubsamplingMIProposal>(ptProposal, coarseProblem, coarseIndex, coarseChain);
 }
 
 std::shared_ptr<UQ::AbstractSamplingProblem>

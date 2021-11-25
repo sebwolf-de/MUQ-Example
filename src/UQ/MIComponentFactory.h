@@ -32,7 +32,8 @@ class MyMIComponentFactory : public ParallelizableMIComponentFactory {
            std::shared_ptr<AbstractSamplingProblem> const& samplingProblem) override;
   std::shared_ptr<MultiIndex> FinestIndex() override;
   std::shared_ptr<MCMCProposal>
-  CoarseProposal(std::shared_ptr<MultiIndex> const& index,
+  CoarseProposal(std::shared_ptr<MultiIndex> const& fineIndex,
+                 std::shared_ptr<MultiIndex> const& coarseIndex,
                  std::shared_ptr<AbstractSamplingProblem> const& coarseProblem,
                  std::shared_ptr<SingleChainMCMC> const& coarseChain) override;
   std::shared_ptr<AbstractSamplingProblem>

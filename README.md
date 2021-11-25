@@ -20,7 +20,7 @@ The goal is to invert for parameters $\alpha, \omega$.
 
 ## How to run ##
 * `mkdir build && cd build`
-Note: I use muq2 with commit `96aa709a3`.
+Note: I use muq2 with commit `7fafda2`.
 * `cmake ..` 
 * `make -j 8`
 * `python ../src/generate_true_solution.py`

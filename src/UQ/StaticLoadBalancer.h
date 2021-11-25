@@ -18,10 +18,10 @@ namespace UQ {
 class MyStaticLoadBalancer : public muq::SamplingAlgorithms::StaticLoadBalancer {
   public:
   void
-  setup(std::shared_ptr<muq::SamplingAlgorithms::ParallelizableMIComponentFactory> componentFactory,
+  virtual setup(std::shared_ptr<muq::SamplingAlgorithms::ParallelizableMIComponentFactory> componentFactory,
         uint availableRanks) override;
-  int numCollectors(std::shared_ptr<MultiIndex> modelIndex) override;
-  WorkerAssignment numWorkers(std::shared_ptr<MultiIndex> modelIndex) override;
+  virtual int numCollectors(std::shared_ptr<MultiIndex> modelIndex) override;
+  virtual WorkerAssignment numWorkers(std::shared_ptr<MultiIndex> modelIndex) override;
   virtual ~MyStaticLoadBalancer(){};
 
   private:
