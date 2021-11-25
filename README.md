@@ -16,7 +16,7 @@ The goal is to invert for parameters $\alpha, \omega$.
 * `src/UQ`: Everyting for uncertainty quantification
 * `src/generate_true_solution.py`: generates the function $u$ with some fixed parameters $\alpha, \omega$
 * `src/main.cpp`: main script, which starts the UQ runner.
-* `tests': Contains unit tests, probably not working
+* `tests`: Contains unit tests, probably not working
 
 ## How to run ##
 * `mkdir build && cd build`
