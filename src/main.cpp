@@ -23,11 +23,19 @@
 #include "spdlog/common.h"
 
 int main(int argc, char** argv) {
+  assert(argc == 2);
+
   MPI_Init(&argc, &argv);
+#ifdef NDEBUG
+  spdlog::set_level(spdlog::level::info);
+#else
   spdlog::set_level(spdlog::level::debug);
+#endif
+
 
   boost::property_tree::ptree pt;
-  const size_t N = 10000;
+  size_t N = std::atoi(argv[1]);
+  
   pt.put("verbosity", 1); // show some output
   pt.put("MCMC.BurnIn", 1);
   pt.put("NumSamples_0", N);
@@ -41,6 +49,7 @@ int main(int argc, char** argv) {
       pt, localFactory, std::make_shared<UQ::MyStaticLoadBalancer>(), comm);
 
   if (comm->GetRank() == 0) {
+    spdlog::info("N = {}", N);
     mimcmc.Run();
     Eigen::VectorXd meanQOI = mimcmc.MeanQOI();
     spdlog::info("mean QOI: ({}, {})", meanQOI(0), meanQOI(1));
