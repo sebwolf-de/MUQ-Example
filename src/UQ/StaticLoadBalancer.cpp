@@ -6,9 +6,9 @@ void UQ::MyStaticLoadBalancer::setup(
     std::shared_ptr<muq::SamplingAlgorithms::ParallelizableMIComponentFactory> componentFactory,
     uint availableRanks) {
   ranks_remaining = availableRanks;
-  spdlog::info("Hi, from the load balancer :D Balancing load across {} ranks", availableRanks);
   auto indices = MultiIndexFactory::CreateFullTensor(componentFactory->FinestIndex()->GetVector());
   models_remaining = indices->Size();
+  spdlog::info("Hi, from the load balancer :D Balancing {} models across {} ranks", models_remaining, ranks_remaining);
 }
 
 int UQ::MyStaticLoadBalancer::numCollectors(

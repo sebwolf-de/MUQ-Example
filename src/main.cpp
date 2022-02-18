@@ -23,7 +23,7 @@
 #include "spdlog/common.h"
 
 int main(int argc, char** argv) {
-  assert(argc == 2);
+  assert(argc == 3);
 
   MPI_Init(&argc, &argv);
 #ifdef NDEBUG
@@ -34,14 +34,16 @@ int main(int argc, char** argv) {
 
 
   boost::property_tree::ptree pt;
-  size_t N = std::atoi(argv[1]);
+  size_t numberOfSamples = std::atoi(argv[1]);
+  size_t subSampling = std::atoi(argv[2]);
   
   pt.put("verbosity", 1); // show some output
   pt.put("MCMC.BurnIn", 1);
-  pt.put("NumSamples_0", N);
+  pt.put("NumSamples_0", 5*numberOfSamples);
+  pt.put("NumSamples_1", numberOfSamples);
   pt.put("MLMCMC.Scheduling", true);
-  pt.put("MLMCMC.Subsampling", 1);
-  pt.put("MLMCMC.Subsampling_0", 3);
+  pt.put("MLMCMC.Subsampling_0", subSampling);
+  pt.put("MLMCMC.Subsampling_1", subSampling);
 
   auto comm = std::make_shared<parcer::Communicator>(MPI_COMM_WORLD);
   auto localFactory = std::make_shared<UQ::MyMIComponentFactory>("true_solution.dat", comm);
@@ -49,7 +51,7 @@ int main(int argc, char** argv) {
       pt, localFactory, std::make_shared<UQ::MyStaticLoadBalancer>(), comm);
 
   if (comm->GetRank() == 0) {
-    spdlog::info("N = {}", N);
+    spdlog::info("N = {}", numberOfSamples);
     mimcmc.Run();
     Eigen::VectorXd meanQOI = mimcmc.MeanQOI();
     spdlog::info("mean QOI: ({}, {})", meanQOI(0), meanQOI(1));
