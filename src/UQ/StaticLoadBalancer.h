@@ -9,7 +9,7 @@
 #include "MUQ/SamplingAlgorithms/MHProposal.h"
 #include "MUQ/SamplingAlgorithms/MIMCMC.h"
 #include "MUQ/SamplingAlgorithms/ParallelFixedSamplesMIMCMC.h"
-#include "MUQ/SamplingAlgorithms/ParallelMIComponentFactory.h"
+#include "MUQ/SamplingAlgorithms/MIComponentFactory.h"
 #include "MUQ/SamplingAlgorithms/SLMCMC.h"
 #include "MUQ/SamplingAlgorithms/SamplingProblem.h"
 #include "MUQ/SamplingAlgorithms/SubsamplingMIProposal.h"

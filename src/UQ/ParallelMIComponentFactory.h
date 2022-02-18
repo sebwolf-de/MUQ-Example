@@ -25,7 +25,7 @@ using namespace muq::Modeling;
 using namespace muq::SamplingAlgorithms;
 using namespace muq::Utilities;
 
-class MyMIComponentFactory : public ParallelizableMIComponentFactory {
+class MyParallelMIComponentFactory : public ParallelizableMIComponentFactory {
   public:
   std::shared_ptr<MCMCProposal>
   Proposal(std::shared_ptr<MultiIndex> const& index,
@@ -42,7 +42,7 @@ class MyMIComponentFactory : public ParallelizableMIComponentFactory {
   Eigen::VectorXd StartingPoint(std::shared_ptr<MultiIndex> const& index) override;
   void SetComm(std::shared_ptr<parcer::Communicator> const& comm) override;
 
-  MyMIComponentFactory(const std::string& filename,
+  MyParallelMIComponentFactory(const std::string& filename,
                        std::shared_ptr<parcer::Communicator> communicator);
 
   private:

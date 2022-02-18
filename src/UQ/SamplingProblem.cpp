@@ -1,4 +1,4 @@
-#include "UQ/SamplingProblem.h"
+#include "SamplingProblem.h"
 #include "MPI/MPIHelpers.h"
 #include "spdlog/spdlog.h"
 

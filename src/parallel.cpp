@@ -16,7 +16,7 @@
 #include "MUQ/SamplingAlgorithms/SamplingProblem.h"
 #include "MUQ/SamplingAlgorithms/SubsamplingMIProposal.h"
 
-#include "UQ/MIComponentFactory.h"
+#include "UQ/ParallelMIComponentFactory.h"
 #include "UQ/MIInterpolation.h"
 #include "UQ/SamplingProblem.h"
 #include "UQ/StaticLoadBalancer.h"
@@ -46,7 +46,7 @@ int main(int argc, char** argv) {
   pt.put("MLMCMC.Subsampling_1", subSampling);
 
   auto comm = std::make_shared<parcer::Communicator>(MPI_COMM_WORLD);
-  auto localFactory = std::make_shared<UQ::MyMIComponentFactory>("true_solution.dat", comm);
+  auto localFactory = std::make_shared<UQ::MyParallelMIComponentFactory>("true_solution.dat", comm);
   muq::SamplingAlgorithms::StaticLoadBalancingMIMCMC mimcmc(
       pt, localFactory, std::make_shared<UQ::MyStaticLoadBalancer>(), comm);
 
@@ -55,8 +55,8 @@ int main(int argc, char** argv) {
     mimcmc.Run();
     Eigen::VectorXd meanQOI = mimcmc.MeanQOI();
     spdlog::info("mean QOI: ({}, {})", meanQOI(0), meanQOI(1));
-    mimcmc.WriteToFile("samples.h5");
-  }
+    mimcmc.WriteToFile("samples0.h5");
+  } 
 
   mimcmc.Finalize();
   MPI_Finalize();
