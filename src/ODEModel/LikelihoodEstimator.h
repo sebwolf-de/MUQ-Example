@@ -1,4 +1,5 @@
-#pragma once
+#ifndef ODEMODEL_LIKELIHOODESTIMATOR_H
+#define ODEMODEL_LIKELIHOODESTIMATOR_H
 
 #include <string>
 
@@ -6,7 +7,7 @@
 
 #include "Function.h"
 
-namespace ODEModel {
+namespace ode_model {
 Function readFromFile(const std::string& filename);
 Eigen::VectorXd interpolate(const Function& f, const Eigen::VectorXd& otherTime);
 
@@ -16,7 +17,9 @@ class LikelihoodEstimator {
 
   public:
   LikelihoodEstimator(const std::string& file);
-  LikelihoodEstimator(const Function);
-  double caluculateLogLikelihood(const Function& solution) const;
+  LikelihoodEstimator(Function);
+  [[nodiscard]] double caluculateLogLikelihood(const Function& solution) const;
 };
-} // namespace ODEModel
+} // namespace ode_model
+
+#endif

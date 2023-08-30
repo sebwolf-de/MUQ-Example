@@ -184,8 +184,8 @@ CheckOptions:
 #    value:           CamelCase
 #  - key:             readability-identifier-naming.MethodSuffix
 #    value:           CamelCase
-#  - key:             readability-identifier-naming.NamespaceCase
-#    value:           CamelCase
+  - key:             readability-identifier-naming.NamespaceCase
+    value:           lower_case
 #  - key:             readability-identifier-naming.NamespacePrefix
 #    value:           CamelCase
 #  - key:             readability-identifier-naming.NamespaceSuffix
