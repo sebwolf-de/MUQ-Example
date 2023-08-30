@@ -1,23 +1,22 @@
 #pragma once
 
+#include <string>
+
 #include <Eigen/Dense>
 
-namespace ODEModel {
+#include "Function.h"
 
-struct function {
-  Eigen::VectorXd time;
-  Eigen::VectorXd x;
-};
-function readFromFile(const std::string& filename);
-Eigen::VectorXd interpolate(const function& f, const Eigen::VectorXd& other_time);
+namespace ODEModel {
+Function readFromFile(const std::string& filename);
+Eigen::VectorXd interpolate(const Function& f, const Eigen::VectorXd& otherTime);
 
 class LikelihoodEstimator {
   private:
-  const function reference_from_file;
+  const Function referenceFromFile;
 
   public:
   LikelihoodEstimator(const std::string& file);
-  LikelihoodEstimator(const function);
-  double caluculateLogLikelihood(const Eigen::Matrix<double, 1, Eigen::Dynamic>& solution) const;
+  LikelihoodEstimator(const Function);
+  double caluculateLogLikelihood(const Function& solution) const;
 };
 } // namespace ODEModel

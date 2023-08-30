@@ -1,29 +1,30 @@
 #include "ODEModel/LikelihoodEstimator.h"
+
 #include "Eigen/src/Core/Array.h"
 #include "Eigen/src/Core/Matrix.h"
 #include "Eigen/src/Core/util/Constants.h"
+
 #include <fstream>
 #include <iostream>
 #include <utility>
 
-ODEModel::LikelihoodEstimator::LikelihoodEstimator(function f)
-    : reference_from_file(std::move(f)) {}
+ODEModel::LikelihoodEstimator::LikelihoodEstimator(Function f)
+    : referenceFromFile(std::move(f)) {}
 
 ODEModel::LikelihoodEstimator::LikelihoodEstimator(const std::string& filename)
-    : reference_from_file(readFromFile(filename)) {}
+    : referenceFromFile(readFromFile(filename)) {}
 
 double ODEModel::LikelihoodEstimator::caluculateLogLikelihood(
-    const Eigen::Matrix<double, 1, Eigen::Dynamic>& solution) const {
-  const size_t N = solution.cols();
-  const Eigen::VectorXd solution_time = Eigen::ArrayXd::LinSpaced(N, 0, 1);
+    const Function& solution) const {
+  const Eigen::VectorXd solutionTime = solution.time;
 
-  Eigen::MatrixXd reference_interpolated = interpolate(reference_from_file, solution_time);
-  Eigen::MatrixXd difference = reference_interpolated.transpose() - solution;
+  Eigen::VectorXd referenceInterpolated = interpolate(referenceFromFile, solutionTime);
+  Eigen::VectorXd difference = referenceInterpolated - solution.values;
 
   return -std::pow(difference.lpNorm<1>(), 2);
 }
 
-ODEModel::function ODEModel::readFromFile(const std::string& file) {
+ODEModel::Function ODEModel::readFromFile(const std::string& file) {
   std::ifstream in(file);
   std::string line;
 
@@ -49,25 +50,25 @@ ODEModel::function ODEModel::readFromFile(const std::string& file) {
   return {time, x};
 }
 
-Eigen::VectorXd ODEModel::interpolate(const function& f, const Eigen::VectorXd& other_time) {
+Eigen::VectorXd ODEModel::interpolate(const Function& f, const Eigen::VectorXd& otherTime) {
   // consistency check:
   // othertime is a subset of f.time
-  assert(other_time(0) >= f.time(0));
-  assert(other_time(other_time.size() - 1) <= f.time(f.time.size() - 1));
+  assert(otherTime(0) >= f.time(0));
+  assert(otherTime(otherTime.size() - 1) <= f.time(f.time.size() - 1));
 
-  Eigen::VectorXd other_x = Eigen::VectorXd::Zero(other_time.size());
+  Eigen::VectorXd other_x = Eigen::VectorXd::Zero(otherTime.size());
   size_t last_index = 0;
-  for (size_t i = 0; i < static_cast<unsigned>(other_time.size()); i++) {
-    const double tau = other_time(i);
+  for (size_t i = 0; i < static_cast<unsigned>(otherTime.size()); i++) {
+    const double tau = otherTime(i);
     // find first time, that is bigger than tau
     for (size_t j = last_index; j < static_cast<unsigned>(f.time.size()); j++) {
       if (f.time(j) == tau) {
-        other_x(i) = f.x(j);
+        other_x(i) = f.values(j);
         break;
       } else if (f.time(j) > tau) {
         const double alpha = (tau - f.time(j - 1)) / (f.time(j) - f.time(j - 1));
         const double beta = (f.time(j) - tau) / (f.time(j) - f.time(j - 1));
-        const double xi = beta * f.x(j - 1) + alpha * f.x(j);
+        const double xi = beta * f.values(j - 1) + alpha * f.values(j);
         other_x(i) = xi;
         last_index = j - 1;
         break;
