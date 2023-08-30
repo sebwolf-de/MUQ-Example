@@ -5,18 +5,18 @@ from matplotlib.ticker import NullFormatter
 import numpy as np
 
 cmdLineParser = argparse.ArgumentParser()
-cmdLineParser.add_argument('filename')
+cmdLineParser.add_argument("filename")
 cmdLineArgs = cmdLineParser.parse_args()
 
-hf = h5py.File(cmdLineArgs.filename, 'r')
-n1 = hf.get('Collector_model0_subchain_0_samples_rank_0').get("samples")
+hf = h5py.File(cmdLineArgs.filename, "r")
+n1 = hf.get("/").get("samples")
 n2 = np.array(n1)
 
-x = n2[0,:]
-y = n2[1,:]
+x = n2[0, :]
+y = n2[1, :]
 
-#adapted from https://matplotlib.org/examples/pylab_examples/scatter_hist.html
-nullfmt = NullFormatter()  
+# adapted from https://matplotlib.org/examples/pylab_examples/scatter_hist.html
+nullfmt = NullFormatter()
 
 # definitions for the axes
 left, width = 0.1, 0.65
@@ -49,7 +49,7 @@ axScatter.set_ylim((0, 1))
 
 bins = np.arange(0, 1 + binwidth, binwidth)
 axHistx.hist(x, bins=bins)
-axHisty.hist(y, bins=bins, orientation='horizontal')
+axHisty.hist(y, bins=bins, orientation="horizontal")
 
 axHistx.set_xlim(axScatter.get_xlim())
 axHisty.set_ylim(axScatter.get_ylim())
