@@ -1,4 +1,4 @@
-Checks: '-*, clang-diagnostic-*, llvm-*, -llvm-else-after-return, misc-*, -misc-non-private-member-variables-in-classes, -misc-unused-parameters, modernize-*, -modernize-use-trailing-return-type, performance-*, readability-*, -readability-else-after-return, -readability-identifier-length'
+Checks: '-*, clang-diagnostic-*, llvm-*, -llvm-else-after-return, -llvm-header-guard, misc-*, -misc-non-private-member-variables-in-classes, -misc-unused-parameters, modernize-*, -modernize-use-trailing-return-type, performance-*, readability-*, -readability-else-after-return, -readability-identifier-length'
 #performance-avoid-endl 
 #performance-enum-size 	 
 #performance-faster-string-find 	Yes

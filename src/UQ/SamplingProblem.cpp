@@ -21,7 +21,7 @@
 
 size_t uq::MySamplingProblem::MySamplingProblem::runCount = 0;
 
-uq::MySamplingProblem::MySamplingProblem(std::shared_ptr<MultiIndex> index,
+uq::MySamplingProblem::MySamplingProblem(const std::shared_ptr<MultiIndex>& index,
                                          std::shared_ptr<ode_model::ODESolver> runner,
                                          size_t numberOfParameters, size_t numberOfFusedSims,
                                          const std::string& referenceFileName,

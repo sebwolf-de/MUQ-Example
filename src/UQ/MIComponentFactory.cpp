@@ -84,6 +84,6 @@ uq::MyMIComponentFactory::MyMIComponentFactory(std::shared_ptr<ode_model::ODESol
                                                size_t finestIndex, size_t numberOfParameters,
                                                size_t numberOfFusedSims,
                                                std::string referenceFileName)
-    : runner(std::move(runner)), startingParameters(std::move(startingParameters)),
+    : runner(std::move(runner)), startingParameters(startingParameters),
       finestIndex(finestIndex), numberOfParameters(numberOfParameters),
       numberOfFusedSims(numberOfFusedSims), referenceFileName(std::move(referenceFileName)) {}
