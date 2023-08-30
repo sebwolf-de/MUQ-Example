@@ -10,8 +10,8 @@
 #include "MUQ/SamplingAlgorithms/SubsamplingMIProposal.h"
 #include "MUQ/Utilities/MultiIndices/MultiIndex.h"
 
-#include "ODEModel/ODESolver.h"
 #include "ODEModel/LikelihoodEstimator.h"
+#include "ODEModel/ODESolver.h"
 
 namespace uq {
 
@@ -48,4 +48,4 @@ class MySamplingProblem : public AbstractSamplingProblem {
   std::shared_ptr<muq::Modeling::Gaussian> target;
 };
 
-} // namespace UQ
+} // namespace uq

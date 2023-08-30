@@ -21,17 +21,14 @@
 
 size_t uq::MySamplingProblem::MySamplingProblem::runCount = 0;
 
-uq::MySamplingProblem::MySamplingProblem(
-    std::shared_ptr<MultiIndex> index, std::shared_ptr<ode_model::ODESolver> runner,
-    size_t numberOfParameters,
-    size_t numberOfFusedSims,
-    const std::string& referenceFileName,
-    std::shared_ptr<muq::Modeling::Gaussian> targetIn)
-    : AbstractSamplingProblem(
-          Eigen::VectorXi::Constant(1, numberOfParameters),
-          Eigen::VectorXi::Constant(1, numberOfParameters)),
-          runner(std::move(runner)), 
-          index(index),
+uq::MySamplingProblem::MySamplingProblem(std::shared_ptr<MultiIndex> index,
+                                         std::shared_ptr<ode_model::ODESolver> runner,
+                                         size_t numberOfParameters, size_t numberOfFusedSims,
+                                         const std::string& referenceFileName,
+                                         std::shared_ptr<muq::Modeling::Gaussian> targetIn)
+    : AbstractSamplingProblem(Eigen::VectorXi::Constant(1, numberOfParameters),
+                              Eigen::VectorXi::Constant(1, numberOfParameters)),
+      runner(std::move(runner)), index(index),
       likelihoodEstimator(ode_model::LikelihoodEstimator(referenceFileName)),
       numberOfParameters(numberOfParameters), numberOfFusedSims(numberOfFusedSims),
       target(std::move(targetIn)) {
@@ -49,7 +46,7 @@ double uq::MySamplingProblem::LogDensity(std::shared_ptr<SamplingState> const& s
   Eigen::MatrixXd u0(numberOfParameters, numberOfFusedSims);
   for (size_t i = 0; i < numberOfParameters; i++) {
     for (size_t j = 0; j < numberOfFusedSims; j++) {
-      u0(i,j) = state->state.at(j)(i);
+      u0(i, j) = state->state.at(j)(i);
     }
   }
 

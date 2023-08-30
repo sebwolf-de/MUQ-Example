@@ -28,7 +28,7 @@ int main() {
   Eigen::MatrixXd u0(numberOfParameters, numberOfFusedSims);
   for (size_t i = 0; i < numberOfParameters; i++) {
     for (size_t j = 0; j < numberOfFusedSims; j++) {
-      u0(i,j) = getRandom();
+      u0(i, j) = getRandom();
     }
   }
   solver.solveIVP(u0, u);

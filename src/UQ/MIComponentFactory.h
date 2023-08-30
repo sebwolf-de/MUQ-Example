@@ -36,10 +36,8 @@ class MyMIComponentFactory : public MIComponentFactory {
   Eigen::VectorXd StartingPoint(std::shared_ptr<MultiIndex> const& index) override;
 
   MyMIComponentFactory(std::shared_ptr<ode_model::ODESolver> runner,
-                       const uq::ValuesAndVariances& startingParameters, 
-                       size_t finestIndex,
-                       size_t numberOfParameters,
-                       size_t numberOfFusedSims,
+                       const uq::ValuesAndVariances& startingParameters, size_t finestIndex,
+                       size_t numberOfParameters, size_t numberOfFusedSims,
                        std::string referenceFileName);
 
   private:

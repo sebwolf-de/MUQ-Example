@@ -65,8 +65,8 @@ uq::MyMIComponentFactory::SamplingProblem(std::shared_ptr<MultiIndex> const& ind
   }
 
   auto prior = std::make_shared<Gaussian>(mu, cov, Gaussian::Mode::Covariance);
-  return std::make_shared<MySamplingProblem>(index, runner,
-                                             numberOfParameters, numberOfFusedSims, referenceFileName, prior);
+  return std::make_shared<MySamplingProblem>(index, runner, numberOfParameters, numberOfFusedSims,
+                                             referenceFileName, prior);
 }
 
 std::shared_ptr<uq::MIInterpolation>
@@ -79,10 +79,11 @@ uq::MyMIComponentFactory::StartingPoint([[maybe_unused]] std::shared_ptr<MultiIn
   return startingParameters.values;
 }
 
-uq::MyMIComponentFactory::MyMIComponentFactory(
-    std::shared_ptr<ode_model::ODESolver> runner,
-    const uq::ValuesAndVariances& startingParameters, size_t finestIndex,
-    size_t numberOfParameters, size_t numberOfFusedSims, std::string referenceFileName)
-    : runner(std::move(runner)), 
-      startingParameters(std::move(startingParameters)), finestIndex(finestIndex),
-      numberOfParameters(numberOfParameters), numberOfFusedSims(numberOfFusedSims), referenceFileName(std::move(referenceFileName)) {}
+uq::MyMIComponentFactory::MyMIComponentFactory(std::shared_ptr<ode_model::ODESolver> runner,
+                                               const uq::ValuesAndVariances& startingParameters,
+                                               size_t finestIndex, size_t numberOfParameters,
+                                               size_t numberOfFusedSims,
+                                               std::string referenceFileName)
+    : runner(std::move(runner)), startingParameters(std::move(startingParameters)),
+      finestIndex(finestIndex), numberOfParameters(numberOfParameters),
+      numberOfFusedSims(numberOfFusedSims), referenceFileName(std::move(referenceFileName)) {}

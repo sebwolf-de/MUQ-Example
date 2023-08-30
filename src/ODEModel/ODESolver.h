@@ -15,11 +15,12 @@ class ODESolver {
   virtual std::vector<Eigen::MatrixXd> solveIVP(Eigen::MatrixXd& u0) const = 0;
 };
 
-class ImplicitEuler : public ODESolver{
+class ImplicitEuler : public ODESolver {
   private:
   const double omega;
   const double dt;
   const size_t n;
+
   public:
   ImplicitEuler(double omega, double dt, size_t n) : omega(omega), dt(dt), n(n){};
   virtual void solveIVP(Eigen::MatrixXd& u0, std::vector<Eigen::MatrixXd>& u) const override {
@@ -40,9 +41,7 @@ class ImplicitEuler : public ODESolver{
     this->solveIVP(u0, result);
     return result;
   }
-  virtual double getDt() const override {
-    return dt;
-  }
+  virtual double getDt() const override { return dt; }
 };
 
 } // namespace ode_model

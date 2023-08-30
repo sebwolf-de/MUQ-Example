@@ -10,6 +10,6 @@ struct ValuesAndVariances {
   Eigen::VectorXd variances;
 };
 
-}
+} // namespace uq
 
 #endif

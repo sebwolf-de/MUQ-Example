@@ -11,8 +11,8 @@ struct Function {
   Eigen::VectorXd values;
 };
 
-inline Function extractSolution(const std::vector<Eigen::MatrixXd>& u,
-                         double dt, size_t fusedIndex) {
+inline Function extractSolution(const std::vector<Eigen::MatrixXd>& u, double dt,
+                                size_t fusedIndex) {
   const size_t numberOfTimesteps = u.size();
   Function f;
   f.time = Eigen::VectorXd::LinSpaced(numberOfTimesteps, 0, (numberOfTimesteps - 1) * dt);

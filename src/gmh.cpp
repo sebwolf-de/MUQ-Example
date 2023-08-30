@@ -27,7 +27,7 @@ using namespace muq::Utilities;
 int main(int argc, char* argv[]) {
   if (argc != 3) {
     std::cout << "Run Generalized Metropolis Hastings MCMC sampling" << std::endl;
-    std::cout << "  Usage: ./gmh numberOfFusedSimulations numberOfSamples" <<std::endl;
+    std::cout << "  Usage: ./gmh numberOfFusedSimulations numberOfSamples" << std::endl;
     return 1;
   }
   const size_t numberOfFusedSims = std::atoi(argv[1]);
@@ -35,10 +35,12 @@ int main(int argc, char* argv[]) {
 
   spdlog::set_level(spdlog::level::debug); // Set global log level to debug
 
-  Eigen::VectorXd initialValues(2); initialValues << 0.1, -0.1;
-  Eigen::VectorXd variances(2); variances << 1.0, 1.0;
+  Eigen::VectorXd initialValues(2);
+  initialValues << 0.1, -0.1;
+  Eigen::VectorXd variances(2);
+  variances << 1.0, 1.0;
   auto initialParameterValuesAndVariance = uq::ValuesAndVariances{initialValues, variances};
-      
+
   const size_t numberOfParameters = 2;
   const double omega = 1.0;
   const double dt = 0.1;
@@ -47,10 +49,8 @@ int main(int argc, char* argv[]) {
   const auto runner = std::make_shared<ode_model::ImplicitEuler>(omega, dt, numberOfTimesteps);
 
   auto miComponentFactory = std::make_shared<uq::MyMIComponentFactory>(
-      runner, 
-      initialParameterValuesAndVariance, 
-      1,
-      numberOfParameters, numberOfFusedSims, "../data/true_solution.dat");
+      runner, initialParameterValuesAndVariance, 1, numberOfParameters, numberOfFusedSims,
+      "../data/true_solution.dat");
 
   auto index = std::make_shared<MultiIndex>(1);
   index->SetValue(0, 0);
