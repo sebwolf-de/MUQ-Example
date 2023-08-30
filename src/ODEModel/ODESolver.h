@@ -1,21 +1,29 @@
 #ifndef ODEMODEL_ODESOLVER_H
 #define ODEMODEL_ODESOLVER_H
 
+#include <cassert>
 #include <vector>
 
 #include <Eigen/Dense>
 
 namespace ode_model {
 
-template <size_t NUMBER_OF_FUSED_SIMS> class ImplicitEuler {
+class ODESolver {
+  public:
+  virtual double getDt() const = 0;
+  virtual void solveIVP(Eigen::MatrixXd& u0, std::vector<Eigen::MatrixXd>& u) const = 0;
+  virtual std::vector<Eigen::MatrixXd> solveIVP(Eigen::MatrixXd& u0) const = 0;
+};
+
+class ImplicitEuler : public ODESolver{
   private:
   const double omega;
-
+  const double dt;
+  const size_t n;
   public:
-  using Matrix_t = Eigen::Matrix<double, 2, NUMBER_OF_FUSED_SIMS>;
-  ImplicitEuler(double omega) : omega(omega){};
-  void solveIVP(Matrix_t& u0, std::vector<Matrix_t>& u, double dt) const {
-    const size_t n = u.capacity();
+  ImplicitEuler(double omega, double dt, size_t n) : omega(omega), dt(dt), n(n){};
+  virtual void solveIVP(Eigen::MatrixXd& u0, std::vector<Eigen::MatrixXd>& u) const override {
+    assert(n == u.capacity());
 
     Eigen::Matrix2d a;
     a << 1, -dt, omega * omega * dt, 1;
@@ -26,6 +34,14 @@ template <size_t NUMBER_OF_FUSED_SIMS> class ImplicitEuler {
     for (size_t i = 1; i < n; i++) {
       u.at(i) = aDecomposition.solve(u.at(i - 1));
     }
+  }
+  virtual std::vector<Eigen::MatrixXd> solveIVP(Eigen::MatrixXd& u0) const override {
+    std::vector<Eigen::MatrixXd> result(n);
+    this->solveIVP(u0, result);
+    return result;
+  }
+  virtual double getDt() const override {
+    return dt;
   }
 };
 

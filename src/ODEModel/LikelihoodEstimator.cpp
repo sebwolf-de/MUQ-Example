@@ -13,7 +13,7 @@ ode_model::LikelihoodEstimator::LikelihoodEstimator(Function f) : referenceFromF
 ode_model::LikelihoodEstimator::LikelihoodEstimator(const std::string& filename)
     : referenceFromFile(readFromFile(filename)) {}
 
-double ode_model::LikelihoodEstimator::caluculateLogLikelihood(const Function& solution) const {
+double ode_model::LikelihoodEstimator::calculateLogLikelihood(const Function& solution) const {
   const Eigen::VectorXd solutionTime = solution.time;
 
   Eigen::VectorXd const referenceInterpolated = interpolate(referenceFromFile, solutionTime);

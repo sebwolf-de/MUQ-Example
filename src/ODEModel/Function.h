@@ -11,8 +11,7 @@ struct Function {
   Eigen::VectorXd values;
 };
 
-template <size_t NUMBER_OF_FUSED_SIMS>
-Function extractSolution(const std::vector<Eigen::Matrix<double, 2, NUMBER_OF_FUSED_SIMS>>& u,
+inline Function extractSolution(const std::vector<Eigen::MatrixXd>& u,
                          double dt, size_t fusedIndex) {
   const size_t numberOfTimesteps = u.size();
   Function f;

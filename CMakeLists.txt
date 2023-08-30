@@ -18,19 +18,10 @@ find_package(MPI REQUIRED)
 find_package(MUQ REQUIRED)
 find_package(Boost COMPONENTS system filesystem graph)
 
-add_library(mpi
-  src/MPI/MPIHelpers.cpp
-  )
-target_include_directories(mpi SYSTEM PUBLIC ${MPI_CXX_INCLUDE_PATH})
-target_link_libraries(mpi MPI::MPI_CXX)
-
 add_library(uq 
   src/UQ/MIInterpolation.cpp
-  src/UQ/ParallelMIComponentFactory.cpp
-  src/UQ/ParallelSamplingProblem.cpp
-  src/UQ/SerialMIComponentFactory.cpp
-  src/UQ/SerialSamplingProblem.cpp
-  src/UQ/StaticLoadBalancer.cpp
+  src/UQ/MIComponentFactory.cpp
+  src/UQ/SamplingProblem.cpp
   )
 target_include_directories(uq PUBLIC ${CMAKE_CURRENT_LIST_DIR}/src)
 target_include_directories(uq SYSTEM PUBLIC ${MUQ_INCLUDE_DIRS})
@@ -39,30 +30,20 @@ target_link_libraries(uq mpi)
 
 add_library(ode 
   src/ODEModel/LikelihoodEstimator.cpp
-  src/ODEModel/ODESolver.cpp
   )
 target_include_directories(ode PUBLIC ${CMAKE_CURRENT_LIST_DIR}/src)
 target_include_directories(ode SYSTEM PUBLIC ${EIGEN3_INCLUDE_DIR})
 target_include_directories(ode SYSTEM PUBLIC ${MUQ_INCLUDE_DIRS})
 
-add_executable(parallel src/parallel.cpp)
-target_include_directories(parallel PUBLIC ${CMAKE_CURRENT_LIST_DIR}/src/)
-target_include_directories(parallel SYSTEM PUBLIC ${MPI_CXX_INCLUDE_PATH})
-target_include_directories(parallel SYSTEM PUBLIC ${MUQ_INCLUDE_DIRS})
-target_link_libraries(parallel uq)
-target_link_libraries(parallel ode)
-target_link_libraries(parallel mpi)
-target_link_libraries(parallel ${MUQ_LIBRARIES} ${MUQ_LINK_LIBRARIES})
-target_link_libraries(parallel MPI::MPI_CXX)
-
-add_executable(serial src/serial.cpp)
-target_include_directories(serial PUBLIC ${CMAKE_CURRENT_LIST_DIR}/src/)
-target_include_directories(serial SYSTEM PUBLIC ${MPI_CXX_INCLUDE_PATH})
-target_include_directories(serial SYSTEM PUBLIC ${MUQ_INCLUDE_DIRS})
-target_link_libraries(serial uq)
-target_link_libraries(serial ode)
-target_link_libraries(serial ${MUQ_LIBRARIES} ${MUQ_LINK_LIBRARIES})
-target_link_libraries(serial MPI::MPI_CXX)
+add_executable(gmh src/gmh.cpp)
+target_include_directories(gmh PUBLIC ${CMAKE_CURRENT_LIST_DIR}/src/)
+target_include_directories(gmh SYSTEM PUBLIC ${MPI_CXX_INCLUDE_PATH})
+target_include_directories(gmh SYSTEM PUBLIC ${MUQ_INCLUDE_DIRS})
+target_link_libraries(gmh uq)
+target_link_libraries(gmh ode)
+target_link_libraries(gmh mpi)
+target_link_libraries(gmh ${MUQ_LIBRARIES} ${MUQ_LINK_LIBRARIES})
+target_link_libraries(gmh MPI::MPI_CXX)
 
 add_executable(likelihoodEstimator src/ODEModel/main.cpp)
 target_link_libraries(likelihoodEstimator ode)

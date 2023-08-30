@@ -18,7 +18,7 @@ class LikelihoodEstimator {
   public:
   LikelihoodEstimator(const std::string& file);
   LikelihoodEstimator(Function);
-  [[nodiscard]] double caluculateLogLikelihood(const Function& solution) const;
+  [[nodiscard]] double calculateLogLikelihood(const Function& solution) const;
 };
 } // namespace ode_model
 

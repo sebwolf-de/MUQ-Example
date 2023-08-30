@@ -1,52 +1,77 @@
-#include "SamplingProblem.h"
-#include "MPI/MPIHelpers.h"
-#include "spdlog/spdlog.h"
+#include "UQ/SamplingProblem.h"
 
-#include <mpi.h>
+#include <algorithm>
+#include <boost/filesystem.hpp>
+#include <boost/filesystem/operations.hpp>
+#include <cmath>
+#include <functional>
+#include <iterator>
+#include <numeric>
+#include <sched.h>
+#include <string>
+#include <unistd.h>
 
 #include "ODEModel/LikelihoodEstimator.h"
+#include "ODEModel/ODESolver.h"
+#include "boost/any.hpp"
+#include <iostream>
+#include <vector>
 
-UQ::MySamplingProblem::MySamplingProblem(const std::shared_ptr<parcer::Communicator>& comm,
-                                         const std::shared_ptr<MultiIndex>& index,
-                                         const ODEModel::LikelihoodEstimator& estimator)
-    : AbstractSamplingProblem(Eigen::VectorXi::Constant(1, NUM_PARAM),
-                              Eigen::VectorXi::Constant(1, NUM_PARAM)),
-      estimator(estimator), comm(comm), index(index) {
-  const size_t global_rank = MPI::get_global_rank();
-  spdlog::info("Run Sampling Problem with index {} on Rank {}.", index->GetValue(0), global_rank);
+#include "spdlog/spdlog.h"
+
+size_t uq::MySamplingProblem::MySamplingProblem::runCount = 0;
+
+uq::MySamplingProblem::MySamplingProblem(
+    std::shared_ptr<MultiIndex> index, std::shared_ptr<ode_model::ODESolver> runner,
+    size_t numberOfParameters,
+    size_t numberOfFusedSims,
+    const std::string& referenceFileName,
+    std::shared_ptr<muq::Modeling::Gaussian> targetIn)
+    : AbstractSamplingProblem(
+          Eigen::VectorXi::Constant(1, numberOfParameters),
+          Eigen::VectorXi::Constant(1, numberOfParameters)),
+          runner(std::move(runner)), 
+          index(index),
+      likelihoodEstimator(ode_model::LikelihoodEstimator(referenceFileName)),
+      numberOfParameters(numberOfParameters), numberOfFusedSims(numberOfFusedSims),
+      target(std::move(targetIn)) {
+  spdlog::info("Run Sampling Problem with index {}", index->GetValue(0));
 }
 
-double UQ::MySamplingProblem::LogDensity(std::shared_ptr<SamplingState> const& state) {
-  runCount++;
-  lastState = state;
+Eigen::VectorXd uq::MySamplingProblem::GradLogDensity(std::shared_ptr<SamplingState> const& state,
+                                                      [[maybe_unused]] unsigned blockWrt) {
+  return target->GradLogDensity(0, state->state); // 0 instead of wrt
+}
 
-  const double badLikelihood = -24;
-  // Discard stupid parameters
-  if (state->state[0][0] > 1.0 || state->state[0][0] < 0.0 || state->state[0][1] > 1.0 ||
-      state->state[0][1] < 0.0) {
-    return badLikelihood;
+double uq::MySamplingProblem::LogDensity(std::shared_ptr<SamplingState> const& state) {
+  lastState = state;
+  // prepare initial condition
+  Eigen::MatrixXd u0(numberOfParameters, numberOfFusedSims);
+  for (size_t i = 0; i < numberOfParameters; i++) {
+    for (size_t j = 0; j < numberOfFusedSims; j++) {
+      u0(i,j) = state->state.at(j)(i);
+    }
   }
 
-  const size_t N = std::pow(35, (index->GetValue(0) + 1)) + 1;
-  auto piece = std::make_shared<ODEModel::MyODEPiece>(N);
-  std::vector<Eigen::VectorXd> inputs(1);
-  inputs.at(0) = state->state[0];
-  std::vector<Eigen::VectorXd> outputs = piece->Evaluate(inputs);
-  Eigen::Matrix<double, 1, Eigen::Dynamic> solution = outputs.at(0);
-  const auto logLikelihood = estimator.caluculateLogLikelihood(solution);
-
-  // Find out the global rank on which I am running:
-  const int global_rank = MPI::get_global_rank();
-  // Create some debug output
-  spdlog::debug("Completed run {} on rank {}, run model for parameter: ({}, {}) with {} DOFs, "
-                "likelihood: {}.",
-                runCount, global_rank, state->state[0][0], state->state[0][1], N, logLikelihood);
-  return logLikelihood;
+  std::vector<double> logDensityArray(numberOfFusedSims);
+  spdlog::info("######################");
+  spdlog::info("Running ODESolver on index {}", index->GetValue(0));
+  const std::time_t startTime = std::time(nullptr);
+  auto u = runner->solveIVP(u0);
+  const std::time_t endTime = std::time(nullptr);
+  const auto duration = endTime - startTime;
+  spdlog::info("Executed ODESolver successfully {} times, took {} seconds.", runCount, duration);
+  for (size_t i = 0; i < numberOfFusedSims; i++) {
+    const auto f = ode_model::extractSolution(u, runner->getDt(), i);
+    const auto likelihood = likelihoodEstimator.calculateLogLikelihood(f);
+    logDensityArray.at(i) = likelihood;
+  }
+  state->meta["LogTarget"] = logDensityArray;
+  runCount += 1;
+  return logDensityArray.at(0);
 }
 
-std::shared_ptr<UQ::SamplingState> UQ::MySamplingProblem::QOI() {
+std::shared_ptr<uq::SamplingState> uq::MySamplingProblem::QOI() {
   assert(lastState != nullptr);
   return std::make_shared<SamplingState>(lastState->state, 1.0);
 }
-
-size_t UQ::MySamplingProblem::runCount = 0;

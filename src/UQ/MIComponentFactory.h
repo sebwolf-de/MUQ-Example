@@ -3,29 +3,23 @@
 #include "MUQ/Modeling/Distributions/Density.h"
 #include "MUQ/Modeling/Distributions/Gaussian.h"
 #include "MUQ/SamplingAlgorithms/CrankNicolsonProposal.h"
-#include "MUQ/SamplingAlgorithms/DummyKernel.h"
-#include "MUQ/SamplingAlgorithms/GreedyMLMCMC.h"
-#include "MUQ/SamplingAlgorithms/MHKernel.h"
 #include "MUQ/SamplingAlgorithms/MHProposal.h"
 #include "MUQ/SamplingAlgorithms/MIComponentFactory.h"
 #include "MUQ/SamplingAlgorithms/MIInterpolation.h"
-#include "MUQ/SamplingAlgorithms/MIMCMC.h"
-#include "MUQ/SamplingAlgorithms/ParallelFixedSamplesMIMCMC.h"
-#include "MUQ/SamplingAlgorithms/SLMCMC.h"
 #include "MUQ/SamplingAlgorithms/SamplingProblem.h"
 #include "MUQ/SamplingAlgorithms/SubsamplingMIProposal.h"
 #include "MUQ/Utilities/MultiIndices/MultiIndex.h"
 
-#include "ODEModel/LikelihoodEstimator.h"
-#include "parcer/Communicator.h"
+#include "ODEModel/ODESolver.h"
+#include "ValuesAndVariances.h"
 
-namespace UQ {
+namespace uq {
 
 using namespace muq::Modeling;
 using namespace muq::SamplingAlgorithms;
 using namespace muq::Utilities;
 
-class MyParallelMIComponentFactory : public ParallelizableMIComponentFactory {
+class MyMIComponentFactory : public MIComponentFactory {
   public:
   std::shared_ptr<MCMCProposal>
   Proposal(std::shared_ptr<MultiIndex> const& index,
@@ -40,13 +34,21 @@ class MyParallelMIComponentFactory : public ParallelizableMIComponentFactory {
   SamplingProblem(std::shared_ptr<MultiIndex> const& index) override;
   std::shared_ptr<MIInterpolation> Interpolation(std::shared_ptr<MultiIndex> const& index) override;
   Eigen::VectorXd StartingPoint(std::shared_ptr<MultiIndex> const& index) override;
-  void SetComm(std::shared_ptr<parcer::Communicator> const& comm) override;
 
-  MyParallelMIComponentFactory(const std::string& filename,
-                       std::shared_ptr<parcer::Communicator> communicator);
+  MyMIComponentFactory(std::shared_ptr<ode_model::ODESolver> runner,
+                       const uq::ValuesAndVariances& startingParameters, 
+                       size_t finestIndex,
+                       size_t numberOfParameters,
+                       size_t numberOfFusedSims,
+                       std::string referenceFileName);
 
   private:
-  const ODEModel::LikelihoodEstimator estimator;
-  std::shared_ptr<parcer::Communicator> communicator;
+  const std::shared_ptr<ode_model::ODESolver> runner;
+  const uq::ValuesAndVariances& startingParameters;
+  const size_t finestIndex;
+  size_t numberOfParameters;
+  size_t numberOfFusedSims;
+  std::string referenceFileName;
 };
-} // namespace UQ
+
+} // namespace uq

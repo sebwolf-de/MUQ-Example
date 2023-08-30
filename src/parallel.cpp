@@ -18,7 +18,7 @@
 
 #include "UQ/ParallelMIComponentFactory.h"
 #include "UQ/MIInterpolation.h"
-#include "UQ/SamplingProblem.h"
+#include "UQ/ParallelSamplingProblem.h"
 #include "UQ/StaticLoadBalancer.h"
 #include "spdlog/common.h"
 
