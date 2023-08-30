@@ -7,8 +7,6 @@
 
 #include "ODEModel/ODESolver.h"
 
-#include "MUQ/SamplingAlgorithms/InfMALAProposal.h"
-#include "MUQ/SamplingAlgorithms/MALAProposal.h"
 #include "MUQ/SamplingAlgorithms/MHProposal.h"
 
 std::shared_ptr<uq::MCMCProposal> uq::MyMIComponentFactory::Proposal(
@@ -16,9 +14,6 @@ std::shared_ptr<uq::MCMCProposal> uq::MyMIComponentFactory::Proposal(
     std::shared_ptr<AbstractSamplingProblem> const& samplingProblem) {
   pt::ptree pt;
   pt.put("BlockIndex", 0);
-
-  // TODO: make flexible
-  const size_t numberOfParameters = 2;
 
   auto mu = Eigen::VectorXd::Zero(numberOfParameters);
   Eigen::MatrixXd cov = Eigen::MatrixXd::Identity(numberOfParameters, numberOfParameters);
@@ -31,8 +26,6 @@ std::shared_ptr<uq::MCMCProposal> uq::MyMIComponentFactory::Proposal(
   auto prior = std::make_shared<Gaussian>(mu, cov, Gaussian::Mode::Covariance);
 
   return std::make_shared<MHProposal>(pt, samplingProblem, prior);
-  // return std::make_shared<MALAProposal>(pt, samplingProblem, prior);
-  // return std::make_shared<InfMALAProposal>(pt, samplingProblem, prior);
 }
 
 std::shared_ptr<uq::MultiIndex> uq::MyMIComponentFactory::FinestIndex() {
@@ -84,6 +77,6 @@ uq::MyMIComponentFactory::MyMIComponentFactory(std::shared_ptr<ode_model::ODESol
                                                size_t finestIndex, size_t numberOfParameters,
                                                size_t numberOfFusedSims,
                                                std::string referenceFileName)
-    : runner(std::move(runner)), startingParameters(startingParameters),
-      finestIndex(finestIndex), numberOfParameters(numberOfParameters),
-      numberOfFusedSims(numberOfFusedSims), referenceFileName(std::move(referenceFileName)) {}
+    : runner(std::move(runner)), startingParameters(startingParameters), finestIndex(finestIndex),
+      numberOfParameters(numberOfParameters), numberOfFusedSims(numberOfFusedSims),
+      referenceFileName(std::move(referenceFileName)) {}

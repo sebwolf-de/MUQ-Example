@@ -22,9 +22,9 @@ using namespace muq::Utilities;
 class MySamplingProblem : public AbstractSamplingProblem {
   public:
   constexpr static double badLogDensity = -1200000;
-  MySamplingProblem(const std::shared_ptr<MultiIndex>& index, std::shared_ptr<ode_model::ODESolver> runner,
-                    size_t numberOfParameters, size_t numberOfFusedSims,
-                    const std::string& referenceFileName,
+  MySamplingProblem(const std::shared_ptr<MultiIndex>& index,
+                    std::shared_ptr<ode_model::ODESolver> runner, size_t numberOfParameters,
+                    size_t numberOfFusedSims, const std::string& referenceFileName,
                     std::shared_ptr<muq::Modeling::Gaussian> targetIn);
 
   double LogDensity(std::shared_ptr<SamplingState> const& state) override;

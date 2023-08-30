@@ -38,7 +38,7 @@ int main(int argc, char* argv[]) {
   Eigen::VectorXd initialValues(2);
   initialValues << 0.1, -0.1;
   Eigen::VectorXd variances(2);
-  variances << 1.0, 1.0;
+  variances << 1.0, 0.5;
   auto initialParameterValuesAndVariance = uq::ValuesAndVariances{initialValues, variances};
 
   const size_t numberOfParameters = 2;
@@ -68,7 +68,7 @@ int main(int argc, char* argv[]) {
   const unsigned int numberOfAcceptedProposals = numberOfFusedSims; // /2;
   pt.put("NumProposals", numberOfProposals);
   pt.put("NumAccepted", numberOfAcceptedProposals);
-  // pt.put("StepSize", 0.5);
+  // pt.put("StepSize", 20.0);
 
   std::vector<std::shared_ptr<TransitionKernel>> kernels(1);
   kernels[0] = std::make_shared<FusedGMHKernel>(pt, problem, proposal);
