@@ -28,6 +28,7 @@ int main(int argc, char* argv[]) {
   if (argc != 3) {
     std::cout << "Run Generalized Metropolis Hastings MCMC sampling" << std::endl;
     std::cout << "  Usage: ./gmh numberOfFusedSimulations numberOfSamples" << std::endl;
+    std::cout << "  if numberOfFusedSims == 1, default to standard MH sampling." << std::endl;
     return 1;
   }
   const size_t numberOfFusedSims = std::atoi(argv[1]);
@@ -71,7 +72,11 @@ int main(int argc, char* argv[]) {
   // pt.put("StepSize", 20.0);
 
   std::vector<std::shared_ptr<TransitionKernel>> kernels(1);
-  kernels[0] = std::make_shared<FusedGMHKernel>(pt, problem, proposal);
+  if (numberOfFusedSims > 1) {
+    kernels[0] = std::make_shared<FusedGMHKernel>(pt, problem, proposal);
+  } else {
+    kernels[0] = std::make_shared<MHKernel>(pt, problem, proposal);
+  }
 
   auto chain = std::make_shared<SingleChainMCMC>(pt, kernels);
   chain->SetState(initialParameterValuesAndVariance.values);
