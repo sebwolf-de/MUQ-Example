@@ -18,7 +18,9 @@
 
 #include <Eigen/Core>
 #include <Eigen/Dense>
+
 #include <iostream>
+#include <sstream>
 
 using namespace muq::Modeling;
 using namespace muq::SamplingAlgorithms;
@@ -39,7 +41,7 @@ int main(int argc, char* argv[]) {
   Eigen::VectorXd initialValues(2);
   initialValues << 0.1, -0.1;
   Eigen::VectorXd variances(2);
-  variances << 1.0, 0.5;
+  variances << 1.0, 1.0;
   auto initialParameterValuesAndVariance = uq::ValuesAndVariances{initialValues, variances};
 
   const size_t numberOfParameters = 2;
@@ -61,15 +63,14 @@ int main(int argc, char* argv[]) {
   // parameters for the sampler
   boost::property_tree::ptree pt;
   pt.put("verbosity", 1); // show some output
-  pt.put("BurnIn", numberOfFusedSims);
+  pt.put("BurnIn", 32 / numberOfFusedSims);
   pt.put("NumSamples", numberOfSamples);
   pt.put("PrintLevel", 1);
 
   const unsigned int numberOfProposals = numberOfFusedSims;
-  const unsigned int numberOfAcceptedProposals = numberOfFusedSims; // /2;
+  const unsigned int numberOfAcceptedProposals = numberOfFusedSims;
   pt.put("NumProposals", numberOfProposals);
   pt.put("NumAccepted", numberOfAcceptedProposals);
-  // pt.put("StepSize", 20.0);
 
   std::vector<std::shared_ptr<TransitionKernel>> kernels(1);
   if (numberOfFusedSims > 1) {
@@ -82,7 +83,11 @@ int main(int argc, char* argv[]) {
   chain->SetState(initialParameterValuesAndVariance.values);
   const std::shared_ptr<SampleCollection> samps = chain->Run();
 
-  samps->WriteToFile("test.h5");
+  std::stringstream filenameStream;
+  filenameStream << "test" << numberOfFusedSims << ".h5";
+  const auto filename = filenameStream.str();
+  std::cout << filename << std::endl;
+  samps->WriteToFile(filename);
   std::cout << "Sample Mean = " << samps->Mean().transpose() << std::endl;
   std::cout << "Variance = " << samps->Variance().transpose() << std::endl;
   std::cout << "ESS = " << samps->ESS().transpose() << std::endl;
