@@ -16,6 +16,8 @@
 
 #include "spdlog/spdlog.h"
 
+#include "argparse/argparse.hpp"
+
 #include <Eigen/Core>
 #include <Eigen/Dense>
 
@@ -26,16 +28,17 @@ using namespace muq::Modeling;
 using namespace muq::SamplingAlgorithms;
 using namespace muq::Utilities;
 
-int main(int argc, char* argv[]) {
-  if (argc != 3) {
-    std::cout << "Run Generalized Metropolis Hastings MCMC sampling" << std::endl;
-    std::cout << "  Usage: ./gmh numberOfFusedSimulations numberOfSamples" << std::endl;
-    std::cout << "  if numberOfFusedSims == 1, default to standard MH sampling." << std::endl;
-    return 1;
-  }
-  const size_t numberOfFusedSims = std::atoi(argv[1]);
-  const size_t numberOfSamples = std::atoi(argv[2]);
+struct MyArgs : public argparse::Args {
+  int& numberOfSamples = arg("numberOfSamples");
+  int& numberOfFusedSims =
+      kwarg("n,numberOfFusedSims", "Number of fused simulations").set_default(4);
+  int& numberOfAcceptedProposals =
+      kwarg("k,numberOfAcceptedProposals", "Number of accepted proposals").set_default(4);
+};
 
+int main(int argc, char* argv[]) {
+  MyArgs args = argparse::parse<MyArgs>(argc, argv);
+  args.print();                            // prints all variables
   spdlog::set_level(spdlog::level::debug); // Set global log level to debug
 
   Eigen::VectorXd initialValues(2);
@@ -52,7 +55,7 @@ int main(int argc, char* argv[]) {
   const auto runner = std::make_shared<ode_model::ImplicitEuler>(omega, dt, numberOfTimesteps);
 
   auto miComponentFactory = std::make_shared<uq::MyMIComponentFactory>(
-      runner, initialParameterValuesAndVariance, 1, numberOfParameters, numberOfFusedSims,
+      runner, initialParameterValuesAndVariance, 1, numberOfParameters, args.numberOfFusedSims,
       "../data/true_solution.dat");
 
   auto index = std::make_shared<MultiIndex>(1);
@@ -63,17 +66,17 @@ int main(int argc, char* argv[]) {
   // parameters for the sampler
   boost::property_tree::ptree pt;
   pt.put("verbosity", 1); // show some output
-  pt.put("BurnIn", 32 / numberOfFusedSims);
-  pt.put("NumSamples", numberOfSamples);
+  pt.put("BurnIn", 32 / args.numberOfFusedSims);
+  pt.put("NumSamples", args.numberOfSamples);
   pt.put("PrintLevel", 1);
 
-  const unsigned int numberOfProposals = numberOfFusedSims;
-  const unsigned int numberOfAcceptedProposals = numberOfFusedSims;
+  const unsigned int numberOfProposals = args.numberOfFusedSims;
+  const unsigned int numberOfAcceptedProposals = args.numberOfAcceptedProposals;
   pt.put("NumProposals", numberOfProposals);
   pt.put("NumAccepted", numberOfAcceptedProposals);
 
   std::vector<std::shared_ptr<TransitionKernel>> kernels(1);
-  if (numberOfFusedSims > 1) {
+  if (args.numberOfFusedSims > 1) {
     kernels[0] = std::make_shared<FusedGMHKernel>(pt, problem, proposal);
   } else {
     kernels[0] = std::make_shared<MHKernel>(pt, problem, proposal);
@@ -84,9 +87,9 @@ int main(int argc, char* argv[]) {
   const std::shared_ptr<SampleCollection> samps = chain->Run();
 
   std::stringstream filenameStream;
-  filenameStream << "test" << numberOfFusedSims << ".h5";
+  filenameStream << "test-" << args.numberOfFusedSims << "-" << args.numberOfAcceptedProposals
+                 << ".h5";
   const auto filename = filenameStream.str();
-  std::cout << filename << std::endl;
   samps->WriteToFile(filename);
   std::cout << "Sample Mean = " << samps->Mean().transpose() << std::endl;
   std::cout << "Variance = " << samps->Variance().transpose() << std::endl;

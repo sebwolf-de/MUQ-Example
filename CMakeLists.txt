@@ -37,6 +37,7 @@ target_include_directories(ode SYSTEM PUBLIC ${MUQ_INCLUDE_DIRS})
 
 add_executable(gmh src/gmh.cpp)
 target_include_directories(gmh PUBLIC ${CMAKE_CURRENT_LIST_DIR}/src/)
+target_include_directories(gmh PUBLIC ${CMAKE_CURRENT_LIST_DIR}/external/)
 target_include_directories(gmh SYSTEM PUBLIC ${MPI_CXX_INCLUDE_PATH})
 target_include_directories(gmh SYSTEM PUBLIC ${MUQ_INCLUDE_DIRS})
 target_link_libraries(gmh uq)
