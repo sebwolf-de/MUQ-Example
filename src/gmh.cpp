@@ -92,6 +92,7 @@ int main(int argc, char* argv[]) {
   const auto filename = filenameStream.str();
   samps->WriteToFile(filename);
   std::cout << "Sample Mean = " << samps->Mean().transpose() << std::endl;
+  std::cout << "Executed solver " << ode_model::ImplicitEuler::numberOfExecutions << " times, to evaluate " << ode_model::ImplicitEuler::numberOfExecutions * args.numberOfFusedSims << " forward models." << std::endl;
   std::cout << "Variance = " << samps->Variance().transpose() << std::endl;
   std::cout << "ESS = " << samps->ESS().transpose() << std::endl;
   std::cout << "Finished all" << std::endl;

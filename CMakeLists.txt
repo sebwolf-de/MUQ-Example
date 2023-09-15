@@ -30,6 +30,7 @@ target_link_libraries(uq mpi)
 
 add_library(ode 
   src/ODEModel/LikelihoodEstimator.cpp
+  src/ODEModel/ODESolver.cpp
   )
 target_include_directories(ode PUBLIC ${CMAKE_CURRENT_LIST_DIR}/src)
 target_include_directories(ode SYSTEM PUBLIC ${EIGEN3_INCLUDE_DIR})

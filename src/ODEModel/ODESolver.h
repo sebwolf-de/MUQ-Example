@@ -23,26 +23,11 @@ class ImplicitEuler : public ODESolver {
   const size_t n;
 
   public:
-  ImplicitEuler(double omega, double dt, size_t n) : omega(omega), dt(dt), n(n){};
-  void solveIVP(Eigen::MatrixXd& u0, std::vector<Eigen::MatrixXd>& u) const override {
-    assert(n == u.capacity());
-
-    Eigen::Matrix2d a;
-    a << 1, -dt, omega * omega * dt, 1;
-    const Eigen::ColPivHouseholderQR<Eigen::Matrix2d> aDecomposition = a.colPivHouseholderQr();
-
-    u.at(0) = u0;
-
-    for (size_t i = 1; i < n; i++) {
-      u.at(i) = aDecomposition.solve(u.at(i - 1));
-    }
-  }
-  std::vector<Eigen::MatrixXd> solveIVP(Eigen::MatrixXd& u0) const override {
-    std::vector<Eigen::MatrixXd> result(n);
-    this->solveIVP(u0, result);
-    return result;
-  }
-  [[nodiscard]] double getDt() const override { return dt; }
+  static size_t numberOfExecutions;
+  ImplicitEuler(double omega, double dt, size_t n);
+  void solveIVP(Eigen::MatrixXd& u0, std::vector<Eigen::MatrixXd>& u) const override;
+  std::vector<Eigen::MatrixXd> solveIVP(Eigen::MatrixXd& u0) const override;
+  [[nodiscard]] double getDt() const override;
 };
 
 } // namespace ode_model
