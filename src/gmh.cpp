@@ -44,7 +44,7 @@ int main(int argc, char* argv[]) {
   Eigen::VectorXd initialValues(2);
   initialValues << 0.1, -0.1;
   Eigen::VectorXd variances(2);
-  variances << 1.0, 1.0;
+  variances << 0.1, 0.1;
   auto initialParameterValuesAndVariance = uq::ValuesAndVariances{initialValues, variances};
 
   const size_t numberOfParameters = 2;
