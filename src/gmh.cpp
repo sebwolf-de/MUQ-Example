@@ -86,15 +86,28 @@ int main(int argc, char* argv[]) {
   chain->SetState(initialParameterValuesAndVariance.values);
   const std::shared_ptr<SampleCollection> samps = chain->Run();
 
+  const Eigen::MatrixXd sampleMatrix = samps->AsMatrix();
+  const unsigned int matrixColumns = sampleMatrix.cols();
+  const Eigen::MatrixXd firstSamples = sampleMatrix(0, Eigen::seq(0, matrixColumns - 2));
+  const Eigen::MatrixXd lastSamples = sampleMatrix(0, Eigen::lastN(matrixColumns - 1));
+  const Eigen::ArrayXXd absoluteDiff = (lastSamples - firstSamples).array().abs();
+  const Eigen::ArrayXX<bool> nonZeroDiff = absoluteDiff > 0;
+  const unsigned changes = absoluteDiff.count();
+
   std::stringstream filenameStream;
   filenameStream << "test-" << args.numberOfFusedSims << "-" << args.numberOfAcceptedProposals
                  << ".h5";
   const auto filename = filenameStream.str();
   samps->WriteToFile(filename);
   std::cout << "Sample Mean = " << samps->Mean().transpose() << std::endl;
-  std::cout << "Executed solver " << ode_model::ImplicitEuler::numberOfExecutions << " times, to evaluate " << ode_model::ImplicitEuler::numberOfExecutions * args.numberOfFusedSims << " forward models." << std::endl;
+  std::cout << "Executed solver " << ode_model::ImplicitEuler::numberOfExecutions
+            << " times, to evaluate "
+            << ode_model::ImplicitEuler::numberOfExecutions * args.numberOfFusedSims
+            << " forward models." << std::endl;
   std::cout << "Variance = " << samps->Variance().transpose() << std::endl;
   std::cout << "ESS = " << samps->ESS().transpose() << std::endl;
+  std::cout << "Acceptance Ratio " << changes << "/" << matrixColumns << " = "
+            << static_cast<double>(changes) / static_cast<double>(matrixColumns) << std::endl;
   std::cout << "Finished all" << std::endl;
 
   return 0;
