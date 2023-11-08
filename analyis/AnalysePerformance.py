@@ -5,6 +5,7 @@ import re
 import matplotlib.pyplot as plt
 from matplotlib.colors import Normalize
 import matplotlib
+matplotlib.rcParams.update({'font.size': 22})
 
 
 def run_gmh_experiment(
@@ -97,36 +98,38 @@ def run_experiment_until_significant(n, k, s, confidence=0.95):
     print(f"{n}, {k}, {s}: found {mean} after {num_measurements} experiments")
     return mean
 
-
-max_fused = 4
+max_fused = 20
 N, K = np.meshgrid(np.arange(1, max_fused + 1), np.arange(1, max_fused + 1))
-matrix = np.empty((max_fused, max_fused, 7))
-matrix[:] = np.nan
-ess = {}
-for n in range(1, max_fused + 1):
-    for k in range(1, n + 1):
-        ess[(n, k)] = run_experiment_until_significant(n, k, 1000)
-        matrix[n - 1, k - 1, :5] = ess[(n, k)]
-print(ess)
+filename = f"matrix_{max_fused}.npy"
 
-matrix[:, :, 5] = matrix[:, :, 1] / matrix[:, :, 0]
-matrix[:, :, 6] = matrix[:, :, 2] / matrix[:, :, 0]
+try:
+    with open(filename, 'rb') as f:
+        matrix = np.load(f)
+    print(matrix.shape)
+    assert matrix.shape == (max_fused, max_fused, 7)
+except:
+    matrix = np.empty((max_fused, max_fused, 7))
+    matrix[:] = np.nan
+    for n in range(1, max_fused + 1):
+        for k in range(1, n + 1):
+            ess = run_experiment_until_significant(n, k, 1000)
+            matrix[n - 1, k - 1, :5] = ess
+    matrix[:, :, 5] = matrix[:, :, 1] / matrix[:, :, 0]
+    matrix[:, :, 6] = matrix[:, :, 2] / matrix[:, :, 0]
+    with open(filename, 'wb') as f:
+        np.save(f, matrix)
+print(matrix)
 
-# matrix = np.random.rand(max_fused, max_fused, 6)
-# matrix[:,:,1] += 2
-# matrix[:,:,2] += 3
-# matrix[:,:,3] += 5
-# matrix[:,:,4] += 6
-
-fig = plt.figure(layout="constrained", figsize=(10, 3))
-axes = fig.subplots(1, 7)
+#fig = plt.figure(layout="constrained", figsize=(20, 5))
+fig = plt.figure(figsize=(20, 5))
+axes = fig.subplots(1, 5)
 for ax in axes:
     ax.set_aspect("equal", "box")
 
 # Execution time
 v_min = np.nanmin(matrix[:, :, 0])
 v_max = np.nanmax(matrix[:, :, 0])
-cmap_time = matplotlib.colormaps["viridis"]
+cmap_time = matplotlib.colormaps["inferno"]
 normalizer = Normalize(v_min, v_max)
 axes[0].pcolormesh(N, K, matrix[:, :, 0], cmap=cmap_time, norm=normalizer)
 fig.colorbar(
@@ -139,14 +142,14 @@ fig.colorbar(
 # Number of forward models
 v_min = np.nanmin(matrix[:, :, 3])
 v_max = np.nanmax(matrix[:, :, 3])
-cmap_forward = matplotlib.colormaps["plasma"]
+cmap_forward = matplotlib.colormaps["inferno"]
 normalizer = Normalize(v_min, v_max)
 axes[1].pcolormesh(N, K, matrix[:, :, 3], cmap=cmap_forward, norm=normalizer)
 fig.colorbar(
     matplotlib.cm.ScalarMappable(norm=normalizer, cmap=cmap_forward),
     ax=axes[1],
     location="bottom",
-    label="# model evaluations",
+    label="# evaluations",
 )
 
 # Acceptance ratio
@@ -163,37 +166,35 @@ fig.colorbar(
 )
 
 # ESS
-v_min = np.nanmin(matrix[:, :, 1:3])
-v_max = np.nanmax(matrix[:, :, 1:3])
-cmap_ess = matplotlib.colormaps["magma"]
+v_min = np.nanmin(matrix[:, :, 1])
+v_max = np.nanmax(matrix[:, :, 1])
+cmap_ess = matplotlib.colormaps["inferno"]
 normalizer = Normalize(v_min, v_max)
 axes[3].pcolormesh(N, K, matrix[:, :, 1], cmap=cmap_ess, norm=normalizer)
-axes[4].pcolormesh(N, K, matrix[:, :, 2], cmap=cmap_ess, norm=normalizer)
 fig.colorbar(
     matplotlib.cm.ScalarMappable(norm=normalizer, cmap=cmap_ess),
-    shrink=0.5,
-    ax=axes[3:5],
+    #shrink=0.5,
+    ax=axes[3],
     location="bottom",
     label="# independent samples",
 )
 
 # ESS per time
-v_min = np.nanmin(matrix[:, :, 5:7])
-v_max = np.nanmax(matrix[:, :, 5:7])
-cmap_ess_per_time = matplotlib.colormaps["cividis"]
+v_min = np.nanmin(matrix[:, :, 5])
+v_max = np.nanmax(matrix[:, :, 5])
+cmap_ess_per_time = matplotlib.colormaps["inferno"]
 normalizer = Normalize(v_min, v_max)
-axes[5].pcolormesh(N, K, matrix[:, :, 5], cmap=cmap_ess_per_time, norm=normalizer)
-axes[6].pcolormesh(N, K, matrix[:, :, 6], cmap=cmap_ess_per_time, norm=normalizer)
+axes[4].pcolormesh(N, K, matrix[:, :, 5], cmap=cmap_ess_per_time, norm=normalizer)
 fig.colorbar(
     matplotlib.cm.ScalarMappable(norm=normalizer, cmap=cmap_ess_per_time),
-    shrink=0.5,
-    ax=axes[5:7],
+    #shrink=0.5,
+    ax=axes[4],
     location="bottom",
     label="# samples / s",
 )
 
 axes_for_headers = fig.subplots(
-    1, 5, width_ratios=[1, 1, 1, 2, 2]
+    1, 5, width_ratios=[1, 1, 1, 1, 1]
 )  # , frameon = False)
 for ax in axes_for_headers:
     ax.axis("off")
@@ -203,4 +204,6 @@ axes_for_headers[2].set_title("Acceptance Ratio")
 axes_for_headers[3].set_title("ESS")
 axes_for_headers[4].set_title("ESS per time")
 
+plt.tight_layout()
+plt.savefig("gmh-performance.pdf")
 plt.show()
